@@ -16,7 +16,7 @@ module.exports = {
     vue: true,
     'tailor-ce': true,
     postcss: {
-      extract: 'dist/tce-apivideo.css'
+      extract: 'tce-apivideo.css'
     },
     babel: {
       sourceMap: true,
@@ -25,6 +25,9 @@ module.exports = {
     alias: {
       resolve: ['.vue', '.js'],
       entries: [{ find: '@', replacement: path.join(__dirname, './src') }]
+    },
+    copy: {
+      targets: [{ src: 'src/server/**', dest: 'dist/dist' }]
     }
   },
   resolvePlugins: {

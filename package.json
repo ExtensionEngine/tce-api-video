@@ -40,7 +40,9 @@
     "eslint-plugin-require-sort": "^1.2.2",
     "eslint-plugin-standard": "^5.0.0",
     "eslint-plugin-vue": "^7.2.0",
-    "rollup-plugin-vue": "^5.1.9",
+    "node-sass": "^5.0.0",
+    "rollup-plugin-copy": "^3.3.0",
+    "rollup-plugin-vue": "^4.3.2",
     "stylelint": "^13.8.0",
     "vue-template-compiler": "^2.6.12"
   },
@@ -48,5 +50,13 @@
     "form-data": "^3.0.0",
     "got": "^11.8.1",
     "http-errors": "^1.8.0"
+  },
+  "tailor": {
+    "label": "Api video",
+    "type": "API_VIDEO",
+    "ui": {
+      "icon": "mdi-video",
+      "forceFullWidth": false
+    }
   }
 }

@@ -23,7 +23,7 @@
 
 <script>
 import get from 'lodash/get';
-import UploadBtn from './UploadBtn';
+import UploadBtn from './UploadBtn.vue';
 
 const FILE_SIZE_LIMIT = 52428800; // 50mb
 const MP4_MIME_TYPE = 'video/mp4';
