@@ -43,5 +43,10 @@
     "rollup-plugin-vue": "^5.1.9",
     "stylelint": "^13.8.0",
     "vue-template-compiler": "^2.6.12"
+  },
+  "dependencies": {
+    "form-data": "^3.0.0",
+    "got": "^11.8.1",
+    "http-errors": "^1.8.0"
   }
 }
