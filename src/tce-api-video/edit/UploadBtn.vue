@@ -1,0 +1,35 @@
+<template>
+  <v-btn
+    @click="onClick"
+    v-bind="$attrs"
+    color="primary darken-3"
+    text
+    class="text-uppercase">
+    <slot name="left">
+      <v-icon color="secondary darken-1" class="mr-2">mdi-cloud-upload-outline</v-icon>
+    </slot>
+    {{ label }}
+    <input
+      ref="uploadInput"
+      @change="$emit('change', $event)"
+      type="file"
+      :accept="accept"
+      class="d-none">
+  </v-btn>
+</template>
+
+<script>
+export default {
+  name: 'video-upload-btn',
+  inheritAttrs: false,
+  props: {
+    label: { type: String, required: true },
+    accept: { type: String, default: null }
+  },
+  methods: {
+    onClick() {
+      this.$refs.uploadInput.click();
+    }
+  }
+};
+</script>
