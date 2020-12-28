@@ -9,6 +9,7 @@ module.exports = {
   },
   overrides: [{
     files: ['src/**'],
+    excludeFiles: ['src/server/**'],
     parserOptions: {
       parser: '@babel/eslint-parser',
       sourceType: 'module'
