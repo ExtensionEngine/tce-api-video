@@ -2,164 +2,35 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var name = "tce-apivideo";
-var version = "0.0.1";
+var plugin__default = require('./Users/ee/Desktop/Projects/ee/tce-apivideo/src/index.js');
 
-//
-//
-//
-//
-var script = {
-  name: 'tce-api-video'
-};
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
-    if (typeof shadowMode !== 'boolean') {
-        createInjectorSSR = createInjector;
-        createInjector = shadowMode;
-        shadowMode = false;
-    }
-    // Vue.extend constructor export interop.
-    const options = typeof script === 'function' ? script.options : script;
-    // render functions
-    if (template && template.render) {
-        options.render = template.render;
-        options.staticRenderFns = template.staticRenderFns;
-        options._compiled = true;
-        // functional template
-        if (isFunctionalTemplate) {
-            options.functional = true;
-        }
-    }
-    // scopedId
-    if (scopeId) {
-        options._scopeId = scopeId;
-    }
-    let hook;
-    if (moduleIdentifier) {
-        // server build
-        hook = function (context) {
-            // 2.3 injection
-            context =
-                context || // cached call
-                    (this.$vnode && this.$vnode.ssrContext) || // stateful
-                    (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext); // functional
-            // 2.2 with runInNewContext: true
-            if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-                context = __VUE_SSR_CONTEXT__;
-            }
-            // inject component styles
-            if (style) {
-                style.call(this, createInjectorSSR(context));
-            }
-            // register component module identifier for async chunk inference
-            if (context && context._registeredComponents) {
-                context._registeredComponents.add(moduleIdentifier);
-            }
-        };
-        // used by ssr in case component is cached and beforeCreate
-        // never gets called
-        options._ssrRegister = hook;
-    }
-    else if (style) {
-        hook = shadowMode
-            ? function (context) {
-                style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
-            }
-            : function (context) {
-                style.call(this, createInjector(context));
-            };
-    }
-    if (hook) {
-        if (options.functional) {
-            // register for functional component in vue file
-            const originalRender = options.render;
-            options.render = function renderWithStyleInjection(h, context) {
-                hook.call(context);
-                return originalRender(h, context);
-            };
-        }
-        else {
-            // inject component registration as beforeCreate hook
-            const existing = options.beforeCreate;
-            options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
-        }
-    }
-    return script;
+function _interopNamespace(e) {
+  if (e && e.__esModule) return e;
+  var n = Object.create(null);
+  if (e) {
+    Object.keys(e).forEach(function (k) {
+      if (k !== 'default') {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () {
+            return e[k];
+          }
+        });
+      }
+    });
+  }
+  n['default'] = e;
+  return Object.freeze(n);
 }
 
-/* script */
-var __vue_script__ = script;
-/* template */
+var plugin__default__default = /*#__PURE__*/_interopDefaultLegacy(plugin__default);
+var plugin__default__namespace = /*#__PURE__*/_interopNamespace(plugin__default);
 
-var __vue_render__ = function __vue_render__() {
-  var _vm = this;
-
-  var _h = _vm.$createElement;
-
-  var _c = _vm._self._c || _h;
-
-  return _c('p', [_vm._v("Custom element template")]);
-};
-
-var __vue_staticRenderFns__ = [];
-/* style */
-
-var __vue_inject_styles__ = undefined;
-/* scoped */
-
-var __vue_scope_id__ = undefined;
-/* module identifier */
-
-var __vue_module_identifier__ = undefined;
-/* functional template */
-
-var __vue_is_functional_template__ = false;
-/* style inject */
-
-/* style inject SSR */
-
-/* style inject shadow dom */
-
-var __vue_component__ = /*#__PURE__*/normalizeComponent({
-  render: __vue_render__,
-  staticRenderFns: __vue_staticRenderFns__
-}, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, undefined, undefined);
-
-/**
- * A method used to create the initial state of the element by declaring the
- * defaults for the elements props. Does not need to be defined.
- */
-
-var initState = function initState() {
-  return {};
-};
-/**
- * The fields that need to be customized are:
- * name: a string that is displayed to a user in the editor
- * ui->icon: a string representing the name of the MDI (https://materialdesignicons.com/)
- * icon that is displayed to the user in the editor
- * ui->forceFullWidth: a boolean value which defines if the element can only be
- * added as full width element
- */
-
-
-var plugin__default = {
-  name: 'Api video',
-  type: 'API_VIDEO',
-  version: '1.0',
-  initState: initState,
-  Edit: __vue_component__,
-  ui: {
-    icon: 'mdi-video',
-    forceFullWidth: true
-  }
-};
-
-var plugin = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  'default': plugin__default
-});
+var name = "tce-apivideo";
+var version = "0.0.1";
 
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
@@ -317,20 +188,20 @@ var hasProp = function hasProp(obj, prop) {
 var isFunction = function isFunction(arg) {
   return typeof arg === 'function';
 };
-var _pluginOptions$initSt = plugin__default.initState,
-    initState$1 = _pluginOptions$initSt === void 0 ? function () {
+var _pluginOptions$initSt = plugin__default__default['default'].initState,
+    initState = _pluginOptions$initSt === void 0 ? function () {
   return {};
 } : _pluginOptions$initSt,
-    _pluginOptions$compon = plugin__default.components,
+    _pluginOptions$compon = plugin__default__default['default'].components,
     components = _pluginOptions$compon === void 0 ? {} : _pluginOptions$compon;
 var options = Object.assign({
   version: version,
-  initState: initState$1,
+  initState: initState,
   components: components
 }, _missingExportShim);
 var install = function install(Vue) {
-  if (hasProp(plugin, 'install')) {
-    isFunction(_missingExportShim) && _missingExportShim(Vue);
+  if (hasProp(plugin__default__namespace, 'install')) {
+    isFunction(plugin__default.install) && plugin__default.install(Vue);
   }
 
   Object.entries(components).forEach(function (_ref) {
@@ -344,6 +215,14 @@ var install = function install(Vue) {
   });
 };
 
+Object.keys(plugin__default).forEach(function (k) {
+  if (k !== 'default') Object.defineProperty(exports, k, {
+    enumerable: true,
+    get: function () {
+      return plugin__default[k];
+    }
+  });
+});
 exports.default = install;
 exports.install = install;
 exports.options = options;
