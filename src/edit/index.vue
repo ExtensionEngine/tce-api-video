@@ -4,6 +4,6 @@
 
 <script>
 export default {
-  name: 'tce-sprout-video'
+  name: 'tce-api-video'
 };
 </script>

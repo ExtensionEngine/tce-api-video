@@ -1,7 +1,7 @@
 {
-  "name": "tce-sproutvideo",
+  "name": "tce-apivideo",
   "version": "0.0.1",
-  "description": "Tailor content element for Sprout video",
+  "description": "Tailor content element for Api video",
   "main": "src/index.js",
   "scripts": {
     "prebuild": "del-cli dist",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ExtensionEngine/tce-sproutvideo.git"
+    "url": "git+https://github.com/ExtensionEngine/tce-apivideo.git"
   },
   "author": "ExtensionEngine <info@extensionengine.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ExtensionEngine/tce-sproutvideo/issues"
+    "url": "https://github.com/ExtensionEngine/tce-apivideo/issues"
   },
-  "homepage": "https://github.com/ExtensionEngine/tce-sproutvideo#readme",
+  "homepage": "https://github.com/ExtensionEngine/tce-apivideo#readme",
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.1",
     "@babel/eslint-plugin": "^7.12.1",

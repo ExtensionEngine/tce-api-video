@@ -15,8 +15,8 @@ const initState = () => ({ });
  * added as full width element
  */
 export default {
-  name: 'Sprout video',
-  type: 'SPROUT_VIDEO',
+  name: 'Api video',
+  type: 'API_VIDEO',
   version: '1.0',
   initState,
   Edit,

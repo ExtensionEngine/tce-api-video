@@ -5,18 +5,18 @@ const path = require('path');
 /** @type {import('bili').Config} */
 module.exports = {
   input: {
-    'tce-sproutvideo': 'src/index.js'
+    'tce-apivideo': 'src/index.js'
   },
   output: {
     format: ['cjs', 'es', 'umd', 'umd-min'],
-    moduleName: 'TceSproutVideo'
+    moduleName: 'TceApiVideo'
   },
   bundleNodeModules: ['rollup-plugin-vue', 'vue-runtime-helpers'],
   plugins: {
     vue: true,
     'tailor-ce': true,
     postcss: {
-      extract: 'dist/tce-sproutvideo.css'
+      extract: 'dist/tce-apivideo.css'
     },
     babel: {
       sourceMap: true,

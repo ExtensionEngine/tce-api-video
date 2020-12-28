@@ -1,10 +1,10 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['tce-sproutvideo'] = {})));
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['tce-apivideo'] = {})));
 }(this, (function (exports) { 'use strict';
 
-  var name = "tce-sproutvideo";
+  var name = "tce-apivideo";
   var version = "0.0.1";
 
   //
@@ -12,7 +12,7 @@
   //
   //
   var script = {
-    name: 'tce-sprout-video'
+    name: 'tce-api-video'
   };
 
   function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
@@ -147,8 +147,8 @@
 
 
   var plugin__default = {
-    name: 'Sprout video',
-    type: 'SPROUT_VIDEO',
+    name: 'Api video',
+    type: 'API_VIDEO',
     version: '1.0',
     initState: initState,
     Edit: __vue_component__,

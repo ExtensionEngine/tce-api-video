@@ -1,8 +1,4 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var name = "tce-sproutvideo";
+var name = "tce-apivideo";
 var version = "0.0.1";
 
 //
@@ -10,7 +6,7 @@ var version = "0.0.1";
 //
 //
 var script = {
-  name: 'tce-sprout-video'
+  name: 'tce-api-video'
 };
 
 function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
@@ -145,8 +141,8 @@ var initState = function initState() {
 
 
 var plugin__default = {
-  name: 'Sprout video',
-  type: 'SPROUT_VIDEO',
+  name: 'Api video',
+  type: 'API_VIDEO',
   version: '1.0',
   initState: initState,
   Edit: __vue_component__,
@@ -344,6 +340,5 @@ var install = function install(Vue) {
   });
 };
 
-exports.default = install;
-exports.install = install;
-exports.options = options;
+export default install;
+export { install, options };
