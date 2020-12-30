@@ -43,8 +43,8 @@ import { PlyrueComponent as Plyrue } from 'plyrue';
 import PreviewOverlay from 'tce-core/PreviewOverlay';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
-const UPLOADING_MSG = 'Video is uploading, please be patient. Do not leave the page or video won\'t be uploaded';
-const PROCESSING_MSG = 'Video is processing. Please refresh the page and try again.';
+const UPLOADING_MSG = 'The video is uploading, please be patient. Do not leave the page or the video won\'t be uploaded.';
+const PROCESSING_MSG = 'Video is processing. Please refresh the page and try again';
 const CHUNK_SIZE = 64 * 1024 * 1024;
 
 export default {
