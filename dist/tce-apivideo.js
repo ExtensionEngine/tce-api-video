@@ -2,6 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var axios = require('axios');
 var tceCore = require('tce-core');
 var get = require('lodash/get');
 var plyrue = require('plyrue');
@@ -9,6 +10,7 @@ var PreviewOverlay = require('tce-core/PreviewOverlay');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
+var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 var get__default = /*#__PURE__*/_interopDefaultLegacy(get);
 var PreviewOverlay__default = /*#__PURE__*/_interopDefaultLegacy(PreviewOverlay);
 
@@ -24,7 +26,12 @@ var tailor = {
 };
 
 //
+var DEFAULT_ERROR_MSG = 'Something went wrong.';
+var UPLOADING_MSG = 'Video is uploading, please be patient. Do not leave the page or video won\'t be uploaded';
+var PROCESSING_MSG = 'Video is processing. Please refresh the page and try again.';
+var CHUNK_SIZE = 64 * 1024 * 1024;
 var script = {
+  name: 'tce-api-video',
   inject: ['$elementBus'],
   props: {
     element: {
@@ -47,7 +54,9 @@ var script = {
   data: function data() {
     return {
       error: null,
-      switchingVideo: false
+      switchingVideo: false,
+      file: null,
+      loading: false
     };
   },
   computed: {
@@ -55,27 +64,99 @@ var script = {
       var $refs = _ref.$refs;
       return get__default['default']($refs, 'video.player');
     },
-    url: function url(_ref2) {
+    videoId: function videoId(_ref2) {
       var element = _ref2.element;
+      return get__default['default'](element, 'data.videoId', '');
+    },
+    uploadUrl: function uploadUrl(_ref3) {
+      var element = _ref3.element;
+      return get__default['default'](element, 'data.uploadUrl', null);
+    },
+    url: function url(_ref4) {
+      var element = _ref4.element;
       return get__default['default'](element, 'data.url', '');
     },
-    fileName: function fileName(_ref3) {
-      var element = _ref3.element;
+    fileName: function fileName(_ref5) {
+      var element = _ref5.element;
       return get__default['default'](element, 'data.fileName', '');
     },
-    playable: function playable(_ref4) {
-      var element = _ref4.element;
+    playable: function playable(_ref6) {
+      var element = _ref6.element;
       return get__default['default'](element, 'data.playable', false);
     },
-    showPlaceholder: function showPlaceholder(_ref5) {
-      var error = _ref5.error,
-          fileName = _ref5.fileName;
+    showPlaceholder: function showPlaceholder(_ref7) {
+      var error = _ref7.error,
+          fileName = _ref7.fileName;
       return !error && !fileName;
     },
-    showVideo: function showVideo(_ref6) {
-      var switchingVideo = _ref6.switchingVideo,
-          isDragged = _ref6.isDragged;
+    showVideo: function showVideo(_ref8) {
+      var switchingVideo = _ref8.switchingVideo,
+          isDragged = _ref8.isDragged;
       return !(switchingVideo || isDragged);
+    },
+    infoMessage: function infoMessage(_ref9) {
+      var error = _ref9.error,
+          loading = _ref9.loading,
+          playable = _ref9.playable;
+      if (error) return;
+      if (loading) return UPLOADING_MSG;
+      if (!playable) return PROCESSING_MSG;
+    }
+  },
+  methods: {
+    upload: function upload(_ref10) {
+      var _this = this;
+
+      var url = _ref10.url,
+          file = _ref10.file,
+          videoId = _ref10.videoId;
+      if (CHUNK_SIZE > file.size) return this.post({
+        url: url,
+        videoId: videoId,
+        chunk: file
+      });
+      var chunks = [];
+      var size = file.size;
+
+      for (var offset = 0; offset < size; offset += CHUNK_SIZE) {
+        var end = Math.min(offset + CHUNK_SIZE, size);
+        var chunk = file.slice(offset, end);
+        chunks.push({
+          chunk: chunk,
+          offset: offset,
+          end: end
+        });
+      }
+
+      return Promise.all(chunks.map(function (it) {
+        return _this.post(Object.assign({
+          url: url,
+          videoId: videoId,
+          size: size
+        }, it));
+      }));
+    },
+    post: function post(_ref11) {
+      var url = _ref11.url,
+          videoId = _ref11.videoId,
+          chunk = _ref11.chunk,
+          size = _ref11.size,
+          offset = _ref11.offset,
+          end = _ref11.end;
+      var headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+
+      if (offset !== undefined && end !== undefined) {
+        headers['Content-Range'] = "bytes ".concat(offset, "-").concat(end - 1, "/").concat(size);
+      }
+
+      var formData = new FormData();
+      formData.append('file', chunk);
+      formData.append('videoId', videoId);
+      return axios__default['default'].post(url, formData, {
+        headers: headers
+      });
     }
   },
   watch: {
@@ -83,25 +164,55 @@ var script = {
       if (oldVal && !val && this.player) this.player.pause();
     },
     url: function url() {
-      var _this = this;
+      var _this2 = this;
 
       this.switchingVideo = true;
       this.$nextTick(function () {
-        return _this.switchingVideo = false;
+        return _this2.switchingVideo = false;
+      });
+    },
+    videoId: function videoId() {
+      var _this3 = this;
+
+      var videoId = this.videoId,
+          file = this.file,
+          url = this.uploadUrl;
+      if (!videoId || !file || !url) return;
+      return this.upload({
+        url: url,
+        file: file,
+        videoId: videoId
+      }).then(function () {
+        _this3.file = null;
+      })["catch"](function (err) {
+        var message = get__default['default'](err, 'response.data.title', DEFAULT_ERROR_MSG);
+
+        _this3.$elementBus.emit('error', {
+          error: {
+            message: message
+          }
+        });
+      })["finally"](function () {
+        _this3.loading = false;
       });
     }
   },
   mounted: function mounted() {
-    var _this2 = this;
+    var _this4 = this;
 
-    this.$elementBus.on('save', function (data) {
-      _this2.error = null;
+    this.$elementBus.on('save', function (_ref12) {
+      var file = _ref12.file;
+      _this4.error = null;
+      _this4.file = file;
+      _this4.loading = true;
 
-      _this2.$emit('save', data);
+      _this4.$emit('save', {
+        fileName: file.name
+      });
     });
-    this.$elementBus.on('error', function (_ref7) {
-      var error = _ref7.error;
-      _this2.error = error;
+    this.$elementBus.on('error', function (_ref13) {
+      var error = _ref13.error;
+      _this4.error = error;
     });
   },
   components: {
@@ -228,13 +339,13 @@ var __vue_render__ = function __vue_render__() {
     staticClass: "message error--text"
   }, [_c('v-icon', {
     staticClass: "error--text"
-  }, [_vm._v("mdi-alert")]), _vm._v("\n        " + _vm._s(_vm.error.message || 'Error loading media!') + "\n      ")], 1)]) : _vm._e(), _vm._v(" "), !_vm.error && !_vm.playable ? _c('div', {
+  }, [_vm._v("mdi-alert")]), _vm._v("\n        " + _vm._s(_vm.error.message || 'Error loading media!') + "\n      ")], 1)]) : _vm._e(), _vm._v(" "), _vm.infoMessage ? _c('div', {
     staticClass: "overlay"
   }, [_c('div', {
     staticClass: "message info--text"
   }, [_c('v-icon', {
     staticClass: "info--text"
-  }, [_vm._v("mdi-alert-circle")]), _vm._v("\n        Video is still processing. Please refresh the page and try again.\n      ")], 1)]) : _vm._e(), _vm._v(" "), _c('div', {
+  }, [_vm._v("mdi-alert-circle")]), _vm._v("\n        " + _vm._s(_vm.infoMessage) + "\n      ")], 1)]) : _vm._e(), _vm._v(" "), _c('div', {
     staticClass: "player"
   }, [_vm.showVideo ? _c('plyrue', {
     ref: "video"
@@ -252,7 +363,7 @@ var __vue_staticRenderFns__ = [];
 var __vue_inject_styles__ = undefined;
 /* scoped */
 
-var __vue_scope_id__ = "data-v-21d6f3e1";
+var __vue_scope_id__ = "data-v-17347f87";
 /* module identifier */
 
 var __vue_module_identifier__ = undefined;
@@ -377,9 +488,8 @@ var UploadBtn = normalizeComponent_1({
 }, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, undefined, undefined);
 
 //
-var FILE_SIZE_LIMIT = 52428800; // 50mb
-
 var MP4_MIME_TYPE = 'video/mp4';
+var FORMAT_ERROR = 'MP4 format is required.';
 var script$2 = {
   name: 'tce-api-video-toolbar',
   inject: ['$elementBus'],
@@ -389,11 +499,6 @@ var script$2 = {
       required: true
     }
   },
-  data: function data() {
-    return {
-      loading: false
-    };
-  },
   computed: {
     fileName: function fileName(_ref) {
       var element = _ref.element;
@@ -402,38 +507,19 @@ var script$2 = {
   },
   methods: {
     upload: function upload(e) {
-      var _this = this;
-
       var file = e.target.files[0];
-
-      if (file.size > FILE_SIZE_LIMIT) {
-        this.$elementBus.emit('error', {
-          error: {
-            message: 'File is too large.'
-          }
-        });
-        return;
-      }
 
       if (file.type !== MP4_MIME_TYPE) {
         this.$elementBus.emit('error', {
           error: {
-            message: 'MP4 format is required.'
+            message: FORMAT_ERROR
           }
         });
         return;
       }
 
-      this.loading = true;
-      var reader = new window.FileReader();
-      reader.readAsDataURL(file);
-      reader.addEventListener('load', function (e) {
-        _this.loading = false;
-
-        _this.$elementBus.emit('save', {
-          dataUrl: e.target.result,
-          fileName: file.name
-        });
+      this.$elementBus.emit('save', {
+        file: file
       });
     }
   },
@@ -466,7 +552,6 @@ var __vue_render__$2 = function __vue_render__() {
   }, [!_vm.fileName ? _c('upload-btn', {
     staticClass: "upload-btn",
     attrs: {
-      "loading": _vm.loading,
       "label": "Upload Api video",
       "accept": "video/mp4"
     },
@@ -489,7 +574,7 @@ var __vue_staticRenderFns__$2 = [];
 var __vue_inject_styles__$2 = undefined;
 /* scoped */
 
-var __vue_scope_id__$2 = "data-v-c817af6c";
+var __vue_scope_id__$2 = "data-v-354077f4";
 /* module identifier */
 
 var __vue_module_identifier__$2 = undefined;

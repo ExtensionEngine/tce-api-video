@@ -1,8 +1,9 @@
 'use strict';
 
-const FormData = require('form-data');
 const got = require('got');
 const httpError = require('http-errors');
+
+const TOKEN_TTL = 300; // time to live in seconds --> 5 minutes
 
 class BaseClient {
   constructor({ apiKey, baseUrl }) {
@@ -41,10 +42,10 @@ class Videos {
     });
   }
 
-  async upload({ title, file }) {
+  async create(title) {
     const { tokenType, accessToken } = await this._request.authenticate();
     const Authorization = [tokenType, accessToken].join(' ');
-    const { videoId } = await this._request.post('videos', {
+    return this._request.post('videos', {
       headers: {
         Authorization,
         Accept: 'application/json',
@@ -56,15 +57,6 @@ class Videos {
         mp4Support: true
       }
     });
-    const form = new FormData();
-    form.append('file', file, title);
-    return this._request.post(`videos/${videoId}/source`, {
-      headers: {
-        Authorization,
-        Accept: 'application/vnd.api.video+json'
-      },
-      body: form
-    });
   }
 
   async status(id) {
@@ -75,6 +67,28 @@ class Videos {
         Accept: 'application/vnd.api.video+json'
       }
     });
+  }
+
+  async getDelegatedToken() {
+    const { tokenType, accessToken } = await this._request.authenticate();
+    return this._request.post('upload-tokens', {
+      headers: {
+        Authorization: [tokenType, accessToken].join(' '),
+        Accept: 'application/vnd.api.video+json',
+        'Content-Type': 'application/json'
+      },
+      json: {
+        ttl: TOKEN_TTL
+      }
+    });
+  }
+
+  async getUploadUrl() {
+    const baseUrl = this._request.prefixUrl;
+    const { token } = await this.getDelegatedToken();
+    const url = new URL('upload', baseUrl);
+    url.searchParams.set('token', token);
+    return url.href;
   }
 }
 
@@ -113,6 +127,10 @@ class Request {
       tokenType,
       accessToken
     }));
+  }
+
+  get prefixUrl() {
+    return this._client.defaults.options.prefixUrl;
   }
 }
 

@@ -18,10 +18,10 @@
           {{ error.message || 'Error loading media!' }}
         </div>
       </div>
-      <div v-if="!error && !playable" class="overlay">
+      <div v-if="infoMessage" class="overlay">
         <div class="message info--text">
           <v-icon class="info--text">mdi-alert-circle</v-icon>
-          Video is still processing. Please refresh the page and try again.
+          {{ infoMessage }}
         </div>
       </div>
       <div class="player">
@@ -36,12 +36,19 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { ElementPlaceholder } from 'tce-core';
 import get from 'lodash/get';
 import { PlyrueComponent as Plyrue } from 'plyrue';
 import PreviewOverlay from 'tce-core/PreviewOverlay';
 
+const DEFAULT_ERROR_MSG = 'Something went wrong.';
+const UPLOADING_MSG = 'Video is uploading, please be patient. Do not leave the page or video won\'t be uploaded';
+const PROCESSING_MSG = 'Video is processing. Please refresh the page and try again.';
+const CHUNK_SIZE = 64 * 1024 * 1024;
+
 export default {
+  name: 'tce-api-video',
   inject: ['$elementBus'],
   props: {
     element: { type: Object, required: true },
@@ -49,14 +56,51 @@ export default {
     isDragged: { type: Boolean, default: false },
     isDisabled: { type: Boolean, default: false }
   },
-  data: () => ({ error: null, switchingVideo: false }),
+  data: () => ({
+    error: null,
+    switchingVideo: false,
+    file: null,
+    loading: false
+  }),
   computed: {
     player: ({ $refs }) => get($refs, 'video.player'),
+    videoId: ({ element }) => get(element, 'data.videoId', ''),
+    uploadUrl: ({ element }) => get(element, 'data.uploadUrl', null),
     url: ({ element }) => get(element, 'data.url', ''),
     fileName: ({ element }) => get(element, 'data.fileName', ''),
     playable: ({ element }) => get(element, 'data.playable', false),
     showPlaceholder: ({ error, fileName }) => !error && !fileName,
-    showVideo: ({ switchingVideo, isDragged }) => !(switchingVideo || isDragged)
+    showVideo: ({ switchingVideo, isDragged }) => !(switchingVideo || isDragged),
+    infoMessage: ({ error, loading, playable }) => {
+      if (error) return;
+      if (loading) return UPLOADING_MSG;
+      if (!playable) return PROCESSING_MSG;
+    }
+  },
+  methods: {
+    upload({ url, file, videoId }) {
+      if (CHUNK_SIZE > file.size) return this.post({ url, videoId, chunk: file });
+      const chunks = [];
+      const { size } = file;
+      for (let offset = 0; offset < size; offset += CHUNK_SIZE) {
+        const end = Math.min(offset + CHUNK_SIZE, size);
+        const chunk = file.slice(offset, end);
+        chunks.push({ chunk, offset, end });
+      }
+      return Promise.all(chunks.map(it => this.post({ url, videoId, size, ...it })));
+    },
+    post({ url, videoId, chunk, size, offset, end }) {
+      const headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+      if (offset !== undefined && end !== undefined) {
+        headers['Content-Range'] = `bytes ${offset}-${end - 1}/${size}`;
+      }
+      const formData = new FormData();
+      formData.append('file', chunk);
+      formData.append('videoId', videoId);
+      return axios.post(url, formData, { headers });
+    }
   },
   watch: {
     isFocused(val, oldVal) {
@@ -65,13 +109,27 @@ export default {
     url() {
       this.switchingVideo = true;
       this.$nextTick(() => (this.switchingVideo = false));
+    },
+    videoId() {
+      const { videoId, file, uploadUrl: url } = this;
+      if (!videoId || !file || !url) return;
+      return this.upload({ url, file, videoId })
+        .then(() => { this.file = null; })
+        .catch(err => {
+          const message = get(err, 'response.data.title', DEFAULT_ERROR_MSG);
+          this.$elementBus.emit('error', { error: { message } });
+        })
+        .finally(() => { this.loading = false; });
     }
   },
   mounted() {
-    this.$elementBus.on('save', data => {
+    this.$elementBus.on('save', ({ file }) => {
       this.error = null;
-      this.$emit('save', data);
+      this.file = file;
+      this.loading = true;
+      this.$emit('save', { fileName: file.name });
     });
+
     this.$elementBus.on('error', ({ error }) => { this.error = error; });
   },
   components: { ElementPlaceholder, Plyrue, PreviewOverlay }

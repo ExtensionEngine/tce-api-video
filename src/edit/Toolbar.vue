@@ -8,7 +8,6 @@
       <upload-btn
         v-if="!fileName"
         @change="upload"
-        :loading="loading"
         label="Upload Api video"
         accept="video/mp4"
         class="upload-btn" />
@@ -25,8 +24,8 @@
 import get from 'lodash/get';
 import UploadBtn from './UploadBtn.vue';
 
-const FILE_SIZE_LIMIT = 52428800; // 50mb
 const MP4_MIME_TYPE = 'video/mp4';
+const FORMAT_ERROR = 'MP4 format is required.';
 
 export default {
   name: 'tce-api-video-toolbar',
@@ -34,28 +33,17 @@ export default {
   props: {
     element: { type: Object, required: true }
   },
-  data: () => ({ loading: false }),
   computed: {
     fileName: ({ element }) => get(element, 'data.fileName', '')
   },
   methods: {
     upload(e) {
       const file = e.target.files[0];
-      if (file.size > FILE_SIZE_LIMIT) {
-        this.$elementBus.emit('error', { error: { message: 'File is too large.' } });
-        return;
-      }
       if (file.type !== MP4_MIME_TYPE) {
-        this.$elementBus.emit('error', { error: { message: 'MP4 format is required.' } });
+        this.$elementBus.emit('error', { error: { message: FORMAT_ERROR } });
         return;
       }
-      this.loading = true;
-      const reader = new window.FileReader();
-      reader.readAsDataURL(file);
-      reader.addEventListener('load', e => {
-        this.loading = false;
-        this.$elementBus.emit('save', { dataUrl: e.target.result, fileName: file.name });
-      });
+      this.$elementBus.emit('save', { file });
     }
   },
   components: { UploadBtn }
