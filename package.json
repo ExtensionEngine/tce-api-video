@@ -47,9 +47,14 @@
     "vue-template-compiler": "^2.6.12"
   },
   "dependencies": {
-    "form-data": "^3.0.0",
+    "axios": "^0.21.1",
     "got": "^11.8.1",
-    "http-errors": "^1.8.0"
+    "http-errors": "^1.8.0",
+    "lodash": "^4.17.20"
+  },
+  "peerDependencies": {
+    "vee-validate": "^3.4.5",
+    "vuetify": "^2.3.21"
   },
   "tailor": {
     "label": "Api video",
