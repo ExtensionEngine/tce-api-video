@@ -711,7 +711,6 @@
       playable: false
     };
   };
-
   var plugin__default = Object.assign({}, info, {
     initState: initState,
     components: {
@@ -726,6 +725,8 @@
 
   var plugin = /*#__PURE__*/Object.freeze({
     __proto__: null,
+    Edit: Edit,
+    Toolbar: Toolbar,
     'default': plugin__default
   });
 
@@ -912,6 +913,8 @@
     });
   };
 
+  exports.Edit = Edit;
+  exports.Toolbar = Toolbar;
   exports.default = install;
   exports.install = install;
   exports.options = options;

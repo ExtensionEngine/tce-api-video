@@ -703,7 +703,6 @@ var initState = function initState() {
     playable: false
   };
 };
-
 var plugin__default = Object.assign({}, info, {
   initState: initState,
   components: {
@@ -718,6 +717,8 @@ var plugin__default = Object.assign({}, info, {
 
 var plugin = /*#__PURE__*/Object.freeze({
   __proto__: null,
+  Edit: Edit,
+  Toolbar: Toolbar,
   'default': plugin__default
 });
 
@@ -905,4 +906,4 @@ var install = function install(Vue) {
 };
 
 export default install;
-export { install, options };
+export { Edit, Toolbar, install, options };
