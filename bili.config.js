@@ -27,7 +27,7 @@ module.exports = {
       entries: [{ find: '@', replacement: path.join(__dirname, './src') }]
     },
     copy: {
-      targets: [{ src: 'src/server/**', dest: 'dist/dist' }]
+      targets: [{ src: 'src/server/**', dest: 'dist' }]
     }
   },
   resolvePlugins: {
