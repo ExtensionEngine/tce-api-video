@@ -1,28 +1,54 @@
 'use strict';
 
-const Request = require('./request');
-const Videos = require('./video');
+const { ClientSandbox } = require('./apiVideo');
+const info = require('../info');
 
-class BaseClient {
-  constructor({ apiKey, baseUrl }) {
-    if (!apiKey) throw new Error('Video Api Key is required');
-    const request = new Request({ apiKey, baseUrl });
-    this.videos = new Videos(request);
-  }
+// process.env approach should be replaced with a more efficient way of accessing env variables!
+const client = new ClientSandbox({ apiKey: process.env.API_VIDEO_API_KEY });
+
+function beforeSave(asset) {
+  const { videoId, fileName } = asset.data;
+  if (videoId || !fileName) return asset;
+  return client.videos.create(fileName)
+    .then(({ videoId }) => {
+      asset.data.playable = false;
+      asset.data.videoId = videoId;
+      return asset;
+    });
 }
 
-class Client extends BaseClient {
-  constructor({ apiKey }) {
-    const baseUrl = 'https://ws.api.video';
-    super({ apiKey, baseUrl });
-  }
+async function afterSave(asset) {
+  const { videoId, playable } = asset.data;
+  if (!videoId || playable) return asset;
+  const interval = setInterval(async () => {
+    const {
+      ingest: { status },
+      encoding: { playable }
+    } = await client.videos.status(videoId);
+    if (status === 'uploaded' && playable) {
+      clearInterval(interval);
+      delete asset.data.uploadUrl;
+      await asset.update({ data: { ...asset.data, playable: true } });
+    }
+  }, 5000);
+  asset.data.uploadUrl = await client.videos.getUploadUrl();
+  return asset;
 }
 
-class ClientSandbox extends BaseClient {
-  constructor({ apiKey }) {
-    const baseUrl = 'https://sandbox.api.video';
-    super({ apiKey, baseUrl });
-  }
+function afterLoaded(asset) {
+  const { videoId, playable } = asset.data;
+  if (!videoId || !playable) return asset;
+  return client.videos.get(videoId)
+    .then(res => {
+      asset.data.embedCode = res.assets.iframe;
+      asset.data.url = res.assets.mp4;
+      return asset;
+    });
 }
 
-module.exports = { Client, ClientSandbox };
+module.exports = {
+  ...info,
+  beforeSave,
+  afterSave,
+  afterLoaded
+};
