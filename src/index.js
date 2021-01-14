@@ -1,8 +1,8 @@
-import Edit from './edit/index.vue';
+import Edit from './edit';
 import info from './info';
-import Toolbar from './edit/Toolbar.vue';
+import Toolbar from './edit/Toolbar';
 
-const initState = () => ({ fileName: null, videoId: null });
+const initState = () => ({ fileName: null, videoId: null, playable: false });
 
 export default {
   ...info,

@@ -9,9 +9,6 @@
       active-placeholder="Use toolbar to upload the video"
       active-icon="mdi-arrow-up" />
     <div v-else>
-      <preview-overlay :show="!isDisabled && !isFocused && playable">
-        Double click to preview
-      </preview-overlay>
       <div v-if="error" class="overlay">
         <div class="message error--text">
           <v-icon class="error--text">mdi-alert</v-icon>
@@ -20,31 +17,23 @@
       </div>
       <div v-if="infoMessage" class="overlay">
         <div class="message info--text">
-          <v-icon class="info--text">mdi-alert-circle</v-icon>
+          <v-progress-circular indeterminate color="info" class="mr-4" />
           {{ infoMessage }}
         </div>
       </div>
-      <div class="player">
-        <plyrue v-if="showVideo" ref="video">
-          <video>
-            <source :src="url" type="video/mp4">
-          </video>
-        </plyrue>
-      </div>
+      <div ref="player" class="player"></div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { ElementPlaceholder } from 'tce-core';
+import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import get from 'lodash/get';
-import { PlyrueComponent as Plyrue } from 'plyrue';
-import PreviewOverlay from 'tce-core/PreviewOverlay';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
-const UPLOADING_MSG = 'The video is uploading, please be patient. Do not leave the page or the video won\'t be uploaded.';
-const PROCESSING_MSG = 'Video is processing. Please refresh the page and try again';
+const UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
+const PROCESSING_MSG = 'Video is processing...';
 const CHUNK_SIZE = 64 * 1024 * 1024;
 
 export default {
@@ -53,24 +42,16 @@ export default {
   props: {
     element: { type: Object, required: true },
     isFocused: { type: Boolean, default: false },
-    isDragged: { type: Boolean, default: false },
     isDisabled: { type: Boolean, default: false }
   },
-  data: () => ({
-    error: null,
-    switchingVideo: false,
-    file: null,
-    loading: false
-  }),
+  data: () => ({ error: null, file: null, loading: false }),
   computed: {
-    player: ({ $refs }) => get($refs, 'video.player'),
     videoId: ({ element }) => get(element, 'data.videoId', ''),
     uploadUrl: ({ element }) => get(element, 'data.uploadUrl', null),
-    url: ({ element }) => get(element, 'data.url', ''),
+    embedCode: ({ element }) => get(element, 'data.embedCode', ''),
     fileName: ({ element }) => get(element, 'data.fileName', ''),
     playable: ({ element }) => get(element, 'data.playable', false),
     showPlaceholder: ({ error, fileName }) => !error && !fileName,
-    showVideo: ({ switchingVideo, isDragged }) => !(switchingVideo || isDragged),
     infoMessage: ({ error, loading, playable }) => {
       if (error) return;
       if (loading) return UPLOADING_MSG;
@@ -100,15 +81,16 @@ export default {
       formData.append('file', chunk);
       formData.append('videoId', videoId);
       return axios.post(url, formData, { headers });
+    },
+    appendVideo() {
+      const { player } = this.$refs;
+      if (!player) return;
+      player.innerHTML = this.embedCode;
     }
   },
   watch: {
-    isFocused(val, oldVal) {
-      if (oldVal && !val && this.player) this.player.pause();
-    },
-    url() {
-      this.switchingVideo = true;
-      this.$nextTick(() => (this.switchingVideo = false));
+    embedCode() {
+      this.appendVideo();
     },
     videoId() {
       const { videoId, file, uploadUrl: url } = this;
@@ -123,6 +105,8 @@ export default {
     }
   },
   mounted() {
+    this.appendVideo();
+
     this.$elementBus.on('save', ({ file }) => {
       this.error = null;
       this.file = file;
@@ -132,7 +116,7 @@ export default {
 
     this.$elementBus.on('error', ({ error }) => { this.error = error; });
   },
-  components: { ElementPlaceholder, Plyrue, PreviewOverlay }
+  components: { ElementPlaceholder }
 };
 </script>
 
