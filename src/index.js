@@ -4,6 +4,8 @@ import Toolbar from './edit/Toolbar.vue';
 
 const initState = () => ({ fileName: null, videoId: null, playable: false });
 
+export { Edit, Toolbar };
+
 export default {
   ...info,
   initState,
