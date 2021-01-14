@@ -7,8 +7,7 @@ const initState = () => ({ fileName: null, videoId: null, playable: false });
 export default {
   ...info,
   initState,
-  Edit,
-  Toolbar,
+  components: { Edit, Toolbar },
   ui: {
     icon: 'mdi-video',
     forceFullWidth: true
