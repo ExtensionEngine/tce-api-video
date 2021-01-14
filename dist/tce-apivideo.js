@@ -715,8 +715,10 @@ var initState = function initState() {
 
 var plugin__default = Object.assign({}, info, {
   initState: initState,
-  Edit: Edit,
-  Toolbar: Toolbar,
+  components: {
+    Edit: Edit,
+    Toolbar: Toolbar
+  },
   ui: {
     icon: 'mdi-video',
     forceFullWidth: true
