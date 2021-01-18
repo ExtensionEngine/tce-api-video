@@ -28,9 +28,7 @@ module.exports = {
     },
     copy: {
       targets: [
-        { src: 'src/server/index.js', dest: 'dist/server' },
-        { src: 'src/server/apiVideo/**', dest: 'dist/server/apiVideo' },
-        { src: 'src/info.js', dest: 'dist' }
+        { src: 'src/server', dest: 'dist/server' }
       ]
     }
   },
