@@ -28,7 +28,8 @@ module.exports = {
     },
     copy: {
       targets: [
-        { src: 'src/server', dest: 'dist/server' }
+        { src: 'src/server', dest: 'dist' },
+        { src: 'src/shared', dest: 'dist' }
       ]
     }
   },
