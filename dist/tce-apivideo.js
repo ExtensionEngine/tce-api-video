@@ -2,13 +2,13 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var axios = require('axios');
 var get = require('lodash/get');
+var axios = require('axios');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 var get__default = /*#__PURE__*/_interopDefaultLegacy(get);
+var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 
 var name = "tce-apivideo";
 var version = "0.0.1";
@@ -19,6 +19,15 @@ var tailor = {
 		icon: "mdi-video",
 		forceFullWidth: false
 	}
+};
+
+var ELEMENT_STATE = {
+  ERROR: 'ERROR',
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED'
+};
+var shared = {
+  ELEMENT_STATE: ELEMENT_STATE
 };
 
 //
@@ -249,11 +258,73 @@ var ElementPlaceholder = normalizeComponent_1({
   staticRenderFns: __vue_staticRenderFns__
 }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, undefined, undefined);
 
+var CHUNK_SIZE = 64 * 1024 * 1024; // 64MB
+
+function upload(_ref) {
+  var url = _ref.url,
+      file = _ref.file,
+      videoId = _ref.videoId;
+  var size = file.size;
+  if (CHUNK_SIZE > file.size) return post({
+    url: url,
+    videoId: videoId,
+    chunk: file
+  });
+  var chunks = createChunks(file);
+  return Promise.all(chunks.map(function (it) {
+    return post(Object.assign({
+      url: url,
+      videoId: videoId,
+      size: size
+    }, it));
+  }));
+}
+
+function createChunks(file) {
+  var chunks = [];
+  var size = file.size;
+
+  for (var offset = 0; offset < size; offset += CHUNK_SIZE) {
+    var end = Math.min(offset + CHUNK_SIZE, size);
+    var chunk = file.slice(offset, end);
+    chunks.push({
+      chunk: chunk,
+      offset: offset,
+      end: end
+    });
+  }
+
+  return chunks;
+}
+
+function post(_ref2) {
+  var url = _ref2.url,
+      videoId = _ref2.videoId,
+      chunk = _ref2.chunk,
+      size = _ref2.size,
+      offset = _ref2.offset,
+      end = _ref2.end;
+  var headers = {
+    'Content-Type': 'multipart/form-data'
+  };
+
+  if (offset !== undefined && end !== undefined) {
+    headers['Content-Range'] = "bytes ".concat(offset, "-").concat(end - 1, "/").concat(size);
+  }
+
+  var formData = new FormData();
+  formData.append('file', chunk);
+  formData.append('videoId', videoId);
+  return axios__default['default'].post(url, formData, {
+    headers: headers
+  });
+}
+
 //
 var DEFAULT_ERROR_MSG = 'Something went wrong.';
+var CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
 var UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
 var PROCESSING_MSG = 'Video is processing...';
-var CHUNK_SIZE = 64 * 1024 * 1024;
 var script$1 = {
   name: 'tce-api-video',
   inject: ['$elementBus'],
@@ -273,154 +344,132 @@ var script$1 = {
   },
   data: function data() {
     return {
-      error: null,
-      file: null,
-      loading: false
+      file: null
     };
   },
   computed: {
     videoId: function videoId(_ref) {
+      var _element$data;
+
       var element = _ref.element;
-      return get__default['default'](element, 'data.videoId', '');
+      return (_element$data = element.data) === null || _element$data === void 0 ? void 0 : _element$data.videoId;
     },
     uploadUrl: function uploadUrl(_ref2) {
+      var _element$data2;
+
       var element = _ref2.element;
-      return get__default['default'](element, 'data.uploadUrl', null);
+      return (_element$data2 = element.data) === null || _element$data2 === void 0 ? void 0 : _element$data2.uploadUrl;
     },
     embedCode: function embedCode(_ref3) {
+      var _element$data3;
+
       var element = _ref3.element;
-      return get__default['default'](element, 'data.embedCode', '');
+      return (_element$data3 = element.data) === null || _element$data3 === void 0 ? void 0 : _element$data3.embedCode;
     },
     fileName: function fileName(_ref4) {
+      var _element$data4;
+
       var element = _ref4.element;
-      return get__default['default'](element, 'data.fileName', '');
+      return (_element$data4 = element.data) === null || _element$data4 === void 0 ? void 0 : _element$data4.fileName;
     },
     playable: function playable(_ref5) {
+      var _element$data5;
+
       var element = _ref5.element;
-      return get__default['default'](element, 'data.playable', false);
+      return (_element$data5 = element.data) === null || _element$data5 === void 0 ? void 0 : _element$data5.playable;
     },
-    showPlaceholder: function showPlaceholder(_ref6) {
-      var error = _ref6.error,
-          fileName = _ref6.fileName;
+    status: function status(_ref6) {
+      var _element$data6;
+
+      var element = _ref6.element;
+      return (_element$data6 = element.data) === null || _element$data6 === void 0 ? void 0 : _element$data6.status;
+    },
+    error: function error(_ref7) {
+      var _element$data7;
+
+      var element = _ref7.element;
+      return (_element$data7 = element.data) === null || _element$data7 === void 0 ? void 0 : _element$data7.error;
+    },
+    showError: function showError(_ref8) {
+      var status = _ref8.status;
+      return status === shared.ELEMENT_STATE.ERROR;
+    },
+    showPlaceholder: function showPlaceholder(_ref9) {
+      var error = _ref9.error,
+          fileName = _ref9.fileName;
       return !error && !fileName;
     },
-    infoMessage: function infoMessage(_ref7) {
-      var error = _ref7.error,
-          loading = _ref7.loading,
-          playable = _ref7.playable;
+    infoMessage: function infoMessage(_ref10) {
+      var error = _ref10.error,
+          status = _ref10.status,
+          playable = _ref10.playable;
       if (error) return;
-      if (loading) return UPLOADING_MSG;
+      if (status === shared.ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
       if (!playable) return PROCESSING_MSG;
     }
   },
   methods: {
-    upload: function upload(_ref8) {
-      var _this = this;
-
-      var url = _ref8.url,
-          file = _ref8.file,
-          videoId = _ref8.videoId;
-      if (CHUNK_SIZE > file.size) return this.post({
-        url: url,
-        videoId: videoId,
-        chunk: file
-      });
-      var chunks = [];
-      var size = file.size;
-
-      for (var offset = 0; offset < size; offset += CHUNK_SIZE) {
-        var end = Math.min(offset + CHUNK_SIZE, size);
-        var chunk = file.slice(offset, end);
-        chunks.push({
-          chunk: chunk,
-          offset: offset,
-          end: end
-        });
-      }
-
-      return Promise.all(chunks.map(function (it) {
-        return _this.post(Object.assign({
-          url: url,
-          videoId: videoId,
-          size: size
-        }, it));
-      }));
-    },
-    post: function post(_ref9) {
-      var url = _ref9.url,
-          videoId = _ref9.videoId,
-          chunk = _ref9.chunk,
-          size = _ref9.size,
-          offset = _ref9.offset,
-          end = _ref9.end;
-      var headers = {
-        'Content-Type': 'multipart/form-data'
-      };
-
-      if (offset !== undefined && end !== undefined) {
-        headers['Content-Range'] = "bytes ".concat(offset, "-").concat(end - 1, "/").concat(size);
-      }
-
-      var formData = new FormData();
-      formData.append('file', chunk);
-      formData.append('videoId', videoId);
-      return axios__default['default'].post(url, formData, {
-        headers: headers
-      });
-    },
     appendVideo: function appendVideo() {
       var player = this.$refs.player;
       if (!player) return;
       player.innerHTML = this.embedCode;
+    },
+    checkIfError: function checkIfError() {
+      var status = this.status,
+          file = this.file,
+          element = this.element;
+      if (status !== shared.ELEMENT_STATE.UPLOADING || file) return;
+      this.$emit('save', Object.assign({}, element.data, {
+        status: shared.ELEMENT_STATE.ERROR,
+        error: CANCEL_UPLOAD_ERROR_MSG
+      }));
     }
   },
   watch: {
-    embedCode: function embedCode() {
-      this.appendVideo();
-    },
+    embedCode: 'appendVideo',
     videoId: function videoId() {
-      var _this2 = this;
+      var _this = this;
 
       var videoId = this.videoId,
           file = this.file,
           url = this.uploadUrl;
       if (!videoId || !file || !url) return;
-      return this.upload({
+      return upload({
         url: url,
         file: file,
         videoId: videoId
       }).then(function () {
-        _this2.file = null;
-      })["catch"](function (err) {
-        var message = get__default['default'](err, 'response.data.title', DEFAULT_ERROR_MSG);
+        _this.file = null;
 
-        _this2.$elementBus.emit('error', {
-          error: {
-            message: message
-          }
-        });
-      })["finally"](function () {
-        _this2.loading = false;
+        _this.$emit('save', Object.assign({}, _this.element.data, {
+          status: shared.ELEMENT_STATE.UPLOADED
+        }));
+      })["catch"](function (err) {
+        return _this.$elementBus.emit('error', err.response);
       });
     }
   },
   mounted: function mounted() {
-    var _this3 = this;
+    var _this2 = this;
 
+    this.checkIfError();
     this.appendVideo();
-    this.$elementBus.on('save', function (_ref10) {
-      var file = _ref10.file;
-      _this3.error = null;
-      _this3.file = file;
-      _this3.loading = true;
+    this.$elementBus.on('save', function (_ref11) {
+      var file = _ref11.file;
+      _this2.file = file;
 
-      _this3.$emit('save', {
-        fileName: file.name
+      _this2.$emit('save', {
+        fileName: file.name,
+        status: shared.ELEMENT_STATE.UPLOADING
       });
     });
-    this.$elementBus.on('error', function (_ref11) {
-      var error = _ref11.error;
-      _this3.error = error;
+    this.$elementBus.on('error', function (_ref12) {
+      var data = _ref12.data;
+
+      _this2.$emit('save', Object.assign({}, _this2.element.data, {
+        status: shared.ELEMENT_STATE.ERROR,
+        error: get__default['default'](data, 'error.message', DEFAULT_ERROR_MSG)
+      }));
     });
   },
   components: {
@@ -450,13 +499,13 @@ var __vue_render__$1 = function __vue_render__() {
       "active-placeholder": "Use toolbar to upload the video",
       "active-icon": "mdi-arrow-up"
     }
-  }) : _c('div', [_vm.error ? _c('div', {
+  }) : _c('div', [_vm.showError ? _c('div', {
     staticClass: "overlay"
   }, [_c('div', {
     staticClass: "message error--text"
   }, [_c('v-icon', {
     staticClass: "error--text"
-  }, [_vm._v("mdi-alert")]), _vm._v("\n        " + _vm._s(_vm.error.message || 'Error loading media!') + "\n      ")], 1)]) : _vm._e(), _vm._v(" "), _vm.infoMessage ? _c('div', {
+  }, [_vm._v("mdi-alert")]), _vm._v("\n        " + _vm._s(_vm.error || 'Error loading media!') + "\n      ")], 1)]) : _vm._e(), _vm._v(" "), !_vm.showError && _vm.infoMessage ? _c('div', {
     staticClass: "overlay"
   }, [_c('div', {
     staticClass: "message info--text"
@@ -478,7 +527,7 @@ var __vue_staticRenderFns__$1 = [];
 var __vue_inject_styles__$1 = undefined;
 /* scoped */
 
-var __vue_scope_id__$1 = "data-v-6431b921";
+var __vue_scope_id__$1 = "data-v-4e690ea2";
 /* module identifier */
 
 var __vue_module_identifier__$1 = undefined;
@@ -499,6 +548,62 @@ var info = {
   type: 'API_VIDEO',
   version: '1.0'
 };
+
+function _slicedToArray(arr, i) {
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
+}
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArrayLimit(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
 
 //
 //
@@ -560,7 +665,7 @@ var __vue_render__$2 = function __vue_render__() {
     on: {
       "click": _vm.onClick
     }
-  }, 'v-btn', _vm.$attrs, false), [_vm._t("left", [_c('v-icon', {
+  }, 'v-btn', _vm.$attrs, false), [_vm._t("icon", [_c('v-icon', {
     staticClass: "mr-2",
     attrs: {
       "color": "secondary darken-1"
@@ -602,7 +707,6 @@ var UploadBtn = normalizeComponent_1({
   staticRenderFns: __vue_staticRenderFns__$2
 }, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, undefined, undefined);
 
-//
 var MP4_MIME_TYPE = 'video/mp4';
 var FORMAT_ERROR = 'MP4 format is required.';
 var script$3 = {
@@ -616,13 +720,16 @@ var script$3 = {
   },
   computed: {
     fileName: function fileName(_ref) {
+      var _element$data;
+
       var element = _ref.element;
-      return get__default['default'](element, 'data.fileName', '');
+      return (_element$data = element.data) === null || _element$data === void 0 ? void 0 : _element$data.fileName;
     }
   },
   methods: {
     upload: function upload(e) {
-      var file = e.target.files[0];
+      var _e$target$files = _slicedToArray(e.target.files, 1),
+          file = _e$target$files[0];
 
       if (file.type !== MP4_MIME_TYPE) {
         this.$elementBus.emit('error', {
@@ -661,7 +768,7 @@ var __vue_render__$3 = function __vue_render__() {
       "color": "transparent"
     }
   }, [_c('v-toolbar-title', {
-    staticClass: "pl-1"
+    staticClass: "pl-1 text-left"
   }, [_vm._v("Api Video")]), _vm._v(" "), _c('v-toolbar-items', {
     staticClass: "mx-auto"
   }, [!_vm.fileName ? _c('upload-btn', {
@@ -673,14 +780,14 @@ var __vue_render__$3 = function __vue_render__() {
     on: {
       "change": _vm.upload
     }
-  }) : [_c('v-text-field', {
+  }) : _c('v-text-field', {
     attrs: {
       "value": _vm.fileName,
       "readonly": "",
       "hide-details": "",
       "filled": ""
     }
-  })]], 2)], 1);
+  })], 1)], 1);
 };
 
 var __vue_staticRenderFns__$3 = [];
@@ -689,7 +796,7 @@ var __vue_staticRenderFns__$3 = [];
 var __vue_inject_styles__$3 = undefined;
 /* scoped */
 
-var __vue_scope_id__$3 = "data-v-354077f4";
+var __vue_scope_id__$3 = "data-v-3a795ea2";
 /* module identifier */
 
 var __vue_module_identifier__$3 = undefined;
@@ -709,9 +816,20 @@ var initState = function initState() {
   return {
     fileName: null,
     videoId: null,
-    playable: false
+    playable: false,
+    status: null,
+    error: null
   };
 };
+/**
+ * The fields that need to be customized are:
+ * name: a string that is displayed to a user in the editor
+ * ui->icon: a string representing the name of the MDI (https://materialdesignicons.com/)
+ * icon that is displayed to the user in the editor
+ * ui->forceFullWidth: a boolean value which defines if the element can only be
+ * added as full width element
+ */
+
 var plugin__default = Object.assign({}, info, {
   initState: initState,
   components: {
@@ -731,15 +849,15 @@ var plugin = /*#__PURE__*/Object.freeze({
   'default': plugin__default
 });
 
-function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+function _slicedToArray$1(arr, i) {
+  return _arrayWithHoles$1(arr) || _iterableToArrayLimit$1(arr, i) || _nonIterableRest$1();
 }
 
-function _arrayWithHoles(arr) {
+function _arrayWithHoles$1(arr) {
   if (Array.isArray(arr)) return arr;
 }
 
-function _iterableToArrayLimit(arr, i) {
+function _iterableToArrayLimit$1(arr, i) {
   if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
     return;
   }
@@ -769,7 +887,7 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
-function _nonIterableRest() {
+function _nonIterableRest$1() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
@@ -904,7 +1022,7 @@ var install = function install(Vue) {
   }
 
   Object.entries(components).forEach(function (_ref) {
-    var _ref2 = _slicedToArray(_ref, 2),
+    var _ref2 = _slicedToArray$1(_ref, 2),
         name$1 = _ref2[0],
         component = _ref2[1];
 
