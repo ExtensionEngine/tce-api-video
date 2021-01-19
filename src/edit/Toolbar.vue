@@ -3,7 +3,7 @@
     height="72"
     color="transparent"
     class="elevation-0">
-    <v-toolbar-title class="pl-1">Api Video</v-toolbar-title>
+    <v-toolbar-title class="pl-1 text-left">Api Video</v-toolbar-title>
     <v-toolbar-items class="mx-auto">
       <upload-btn
         v-if="!fileName"
@@ -11,17 +11,15 @@
         label="Upload Api video"
         accept="video/mp4"
         class="upload-btn" />
-      <template v-else>
-        <v-text-field
-          :value="fileName"
-          readonly hide-details filled />
-      </template>
+      <v-text-field
+        v-else
+        :value="fileName"
+        readonly hide-details filled />
     </v-toolbar-items>
   </v-toolbar>
 </template>
 
 <script>
-import get from 'lodash/get';
 import UploadBtn from './UploadBtn.vue';
 
 const MP4_MIME_TYPE = 'video/mp4';
@@ -34,11 +32,11 @@ export default {
     element: { type: Object, required: true }
   },
   computed: {
-    fileName: ({ element }) => get(element, 'data.fileName', '')
+    fileName: ({ element }) => element.data?.fileName
   },
   methods: {
     upload(e) {
-      const file = e.target.files[0];
+      const [file] = e.target.files;
       if (file.type !== MP4_MIME_TYPE) {
         this.$elementBus.emit('error', { error: { message: FORMAT_ERROR } });
         return;
@@ -53,13 +51,12 @@ export default {
 <style lang="scss" scoped>
 .v-toolbar__title {
   min-width: 23.875rem;
-  text-align: left;
 }
 
 .upload-btn ::v-deep .v-btn {
   height: 100%;
 
-  .v-btn__content {
+  &__content {
     padding: 1.5rem 0;
   }
 }
