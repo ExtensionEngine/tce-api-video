@@ -3,10 +3,10 @@
 const { createSandBoxClient } = require('./apiVideo');
 const { ELEMENT_STATE } = require('../shared');
 
-function beforeSave(asset, { config: { tceApiVideo } }) {
+function beforeSave(asset, { config: { tce } }) {
   const { videoId, fileName, status } = asset.data;
   if (isError(status) || videoId || !fileName) return asset;
-  const client = createSandBoxClient({ apiKey: tceApiVideo.apiKey });
+  const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
   return client.videos.create(fileName)
     .then(({ videoId }) => {
       asset.data.playable = false;
@@ -20,10 +20,10 @@ function beforeSave(asset, { config: { tceApiVideo } }) {
     });
 }
 
-async function afterSave(asset, { config: { tceApiVideo } }) {
+async function afterSave(asset, { config: { tce } }) {
   const { videoId, playable, status } = asset.data;
   if (isError(status) || !videoId || playable) return asset;
-  const client = createSandBoxClient({ apiKey: tceApiVideo.apiKey });
+  const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
   if (status === ELEMENT_STATE.UPLOADED) {
     const interval = setInterval(async () => {
       const {
@@ -41,10 +41,10 @@ async function afterSave(asset, { config: { tceApiVideo } }) {
   return asset;
 }
 
-function afterLoaded(asset, { config: { tceApiVideo } }) {
+function afterLoaded(asset, { config: { tce } }) {
   const { videoId, playable, status } = asset.data;
   if (isError(status) || !videoId || !playable) return asset;
-  const client = createSandBoxClient({ apiKey: tceApiVideo.apiKey });
+  const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
   return client.videos.get(videoId)
     .then(res => {
       asset.data.embedCode = res.assets.iframe;
