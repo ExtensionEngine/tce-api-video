@@ -43,7 +43,9 @@ class Request {
 const resFormatter = res => res.data;
 
 function handleError(error) {
-  const { status, title } = error.response.data;
+  const { response } = error;
+  if (!response) return Promise.reject(error);
+  const { status, title } = response.data;
   return Promise.reject(httpError(status, title));
 }
 
