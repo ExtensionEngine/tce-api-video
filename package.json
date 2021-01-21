@@ -1,5 +1,5 @@
 {
-  "name": "tce-apivideo",
+  "name": "tce-api-video",
   "version": "0.0.1",
   "description": "Tailor content element for Api video",
   "main": "src/index.js",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ExtensionEngine/tce-apivideo.git"
+    "url": "git+https://github.com/ExtensionEngine/tce-api-video.git"
   },
   "author": "ExtensionEngine <info@extensionengine.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ExtensionEngine/tce-apivideo/issues"
+    "url": "https://github.com/ExtensionEngine/tce-api-video/issues"
   },
-  "homepage": "https://github.com/ExtensionEngine/tce-apivideo#readme",
+  "homepage": "https://github.com/ExtensionEngine/tce-api-video#readme",
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.1",
     "@babel/eslint-plugin": "^7.12.1",
