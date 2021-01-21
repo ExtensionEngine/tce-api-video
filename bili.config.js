@@ -5,7 +5,7 @@ const path = require('path');
 /** @type {import('bili').Config} */
 module.exports = {
   input: {
-    'tce-apivideo': 'src/index.js'
+    'tce-api-video': 'src/index.js'
   },
   output: {
     format: ['cjs', 'es', 'umd', 'umd-min'],
@@ -16,7 +16,7 @@ module.exports = {
     vue: true,
     'tailor-ce': true,
     postcss: {
-      extract: 'dist/tce-apivideo.css'
+      extract: 'dist/tce-api-video.css'
     },
     babel: {
       sourceMap: true,
