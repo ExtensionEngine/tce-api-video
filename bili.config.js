@@ -16,11 +16,7 @@ module.exports = {
     vue: true,
     'tailor-ce': true,
     postcss: {
-<<<<<<< HEAD
-      extract: 'tce-apivideo.css'
-=======
       extract: 'dist/tce-api-video.css'
->>>>>>> 8171bacbc0cab5fb3dc2dcc9e498f5a5f3f6b855
     },
     babel: {
       sourceMap: true,
