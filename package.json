@@ -48,10 +48,7 @@
   },
   "peerDependencies": {
     "vee-validate": "^3.4.5",
-    "vuetify": "^2.3.21",
-    "axios": "^0.21.1",
-    "http-errors": "^1.8.0",
-    "lodash": "^4.17.20"
+    "vuetify": "^2.3.21"
   },
   "tailor": {
     "label": "Api video",
@@ -60,5 +57,10 @@
       "icon": "mdi-video",
       "forceFullWidth": false
     }
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "http-errors": "^1.8.0",
+    "lodash": "^4.17.20"
   }
 }
