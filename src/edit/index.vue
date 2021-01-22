@@ -130,7 +130,7 @@ export default {
   .message {
     position: relative;
     top: 45%;
-    font-size: 1.125rem !important;
+    font-size: 1.125rem;
   }
 }
 
