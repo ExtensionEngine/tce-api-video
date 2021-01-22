@@ -1,12 +1,15 @@
 'use strict';
 
-const { createSandBoxClient } = require('./apiVideo');
+const { createClient } = require('./apiVideo');
 const { ELEMENT_STATE } = require('../shared');
 
 function beforeSave(asset, { config: { tce } }) {
   const { videoId, fileName, error } = asset.data;
-  if (error || videoId || !fileName) return asset;
-  const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
+  const isUploadedOrError = error || videoId || !fileName;
+  if (isUploadedOrError) return asset;
+  const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
+  const isSandBox = apiVideoIsSandbox === 'true';
+  const client = createClient({ apiKey, isSandBox });
   return client.videos.create(fileName)
     .then(({ videoId }) => {
       asset.data.playable = false;
@@ -18,8 +21,11 @@ function beforeSave(asset, { config: { tce } }) {
 
 async function afterSave(asset, { config: { tce } }) {
   const { videoId, playable, error, status } = asset.data;
-  if (error || !videoId || playable) return asset;
-  const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
+  const isAvailableOrError = error || !videoId || playable;
+  if (isAvailableOrError) return asset;
+  const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
+  const isSandBox = apiVideoIsSandbox === 'true';
+  const client = createClient({ apiKey, isSandBox });
   if (status === ELEMENT_STATE.UPLOADED) trackPlayableStatus(asset, client);
   asset.data.uploadUrl = await client.videos.getUploadUrl();
   return asset;
@@ -42,8 +48,11 @@ async function trackPlayableStatus(asset, client) {
 
 function afterLoaded(asset, { config: { tce } }) {
   const { videoId, playable, error } = asset.data;
-  if (error || !videoId || !playable) return asset;
-  const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
+  const isUnavailableOrError = error || !videoId || !playable;
+  if (isUnavailableOrError) return asset;
+  const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
+  const isSandBox = apiVideoIsSandbox === 'true';
+  const client = createClient({ apiKey, isSandBox });
   return client.videos.get(videoId)
     .then(res => {
       asset.data.embedCode = res.assets.iframe;
