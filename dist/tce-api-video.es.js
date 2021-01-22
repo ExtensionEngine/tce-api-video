@@ -13,7 +13,6 @@ var tailor = {
 };
 
 var ELEMENT_STATE = {
-  ERROR: 'ERROR',
   UPLOADING: 'UPLOADING',
   UPLOADED: 'UPLOADED'
 };
@@ -70,31 +69,31 @@ var script = {
     },
     placeholder: {
       type: String,
-      default: 'Select to edit'
+      "default": 'Select to edit'
     },
     activePlaceholder: {
       type: String,
-      default: 'Use toolbar to edit'
+      "default": 'Use toolbar to edit'
     },
     activeIcon: {
       type: String,
-      default: null
+      "default": null
     },
     activeColor: {
       type: String,
-      default: '#fff'
+      "default": '#fff'
     },
     isDisabled: {
       type: Boolean,
-      default: false
+      "default": false
     },
     isFocused: {
       type: Boolean,
-      default: false
+      "default": false
     },
     dense: {
       type: Boolean,
-      default: false
+      "default": false
     }
   },
   computed: {
@@ -203,7 +202,7 @@ var __vue_render__ = function __vue_render__() {
 
   return _c('v-sheet', {
     staticClass: "transparent grey--text text--darken-4",
-    class: _vm.dense ? 'pt-3' : 'pa-12'
+    "class": _vm.dense ? 'pt-3' : 'pa-12'
   }, [_c('v-avatar', {
     attrs: {
       "size": _vm.dense ? 40 : 60,
@@ -216,7 +215,7 @@ var __vue_render__ = function __vue_render__() {
     }
   }, [_vm._v("\n      " + _vm._s(_vm.icon) + "\n    ")])], 1), _vm._v(" "), _c('div', {
     staticClass: "grey--text",
-    class: [_vm.isDisabled ? 'text--darken-3' : 'text--darken-4', _vm.dense ? 'my-2 subtitle-2' : 'my-4 headline']
+    "class": [_vm.isDisabled ? 'text--darken-3' : 'text--darken-4', _vm.dense ? 'my-2 subtitle-2' : 'my-4 headline']
   }, [_vm._v("\n    " + _vm._s(_vm.name) + "\n  ")]), _vm._v(" "), !_vm.dense && !_vm.isDisabled ? _c('div', {
     staticClass: "subtitle-1"
   }, [!_vm.isFocused ? [_vm._v(_vm._s(_vm.placeholder))] : [_c('span', [_vm._v(_vm._s(_vm.activePlaceholder))]), _vm._v(" "), _vm.activeIcon ? _c('v-icon', {
@@ -326,11 +325,11 @@ var script$1 = {
     },
     isFocused: {
       type: Boolean,
-      default: false
+      "default": false
     },
     isDisabled: {
       type: Boolean,
-      default: false
+      "default": false
     }
   },
   data: function data() {
@@ -381,22 +380,24 @@ var script$1 = {
       var element = _ref7.element;
       return (_element$data7 = element.data) === null || _element$data7 === void 0 ? void 0 : _element$data7.error;
     },
-    showError: function showError(_ref8) {
-      var status = _ref8.status;
-      return status === shared.ELEMENT_STATE.ERROR;
-    },
-    showPlaceholder: function showPlaceholder(_ref9) {
-      var error = _ref9.error,
-          fileName = _ref9.fileName;
+    showPlaceholder: function showPlaceholder(_ref8) {
+      var error = _ref8.error,
+          fileName = _ref8.fileName;
       return !error && !fileName;
     },
-    infoMessage: function infoMessage(_ref10) {
-      var error = _ref10.error,
-          status = _ref10.status,
-          playable = _ref10.playable;
+    infoMessage: function infoMessage(_ref9) {
+      var error = _ref9.error,
+          status = _ref9.status,
+          playable = _ref9.playable;
       if (error) return;
       if (status === shared.ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
       if (!playable) return PROCESSING_MSG;
+    },
+    isPreparedToUpload: function isPreparedToUpload(_ref10) {
+      var videoId = _ref10.videoId,
+          file = _ref10.file,
+          uploadUrl = _ref10.uploadUrl;
+      return videoId && file && uploadUrl;
     }
   },
   methods: {
@@ -411,33 +412,34 @@ var script$1 = {
           element = this.element;
       if (status !== shared.ELEMENT_STATE.UPLOADING || file) return;
       this.$emit('save', Object.assign({}, element.data, {
-        status: shared.ELEMENT_STATE.ERROR,
         error: CANCEL_UPLOAD_ERROR_MSG
       }));
-    }
-  },
-  watch: {
-    embedCode: 'appendVideo',
-    videoId: function videoId() {
+    },
+    upload: function upload$1() {
       var _this = this;
 
       var videoId = this.videoId,
           file = this.file,
           url = this.uploadUrl;
-      if (!videoId || !file || !url) return;
-      return upload({
-        url: url,
+      upload({
+        videoId: videoId,
         file: file,
-        videoId: videoId
+        url: url
       }).then(function () {
         _this.file = null;
 
         _this.$emit('save', Object.assign({}, _this.element.data, {
           status: shared.ELEMENT_STATE.UPLOADED
         }));
-      }).catch(function (err) {
+      })["catch"](function (err) {
         return _this.$elementBus.emit('error', err.response);
       });
+    }
+  },
+  watch: {
+    embedCode: 'appendVideo',
+    videoId: function videoId() {
+      if (this.isPreparedToUpload) this.upload();
     }
   },
   mounted: function mounted() {
@@ -458,7 +460,6 @@ var script$1 = {
       var data = _ref12.data;
 
       _this2.$emit('save', Object.assign({}, _this2.element.data, {
-        status: shared.ELEMENT_STATE.ERROR,
         error: get(data, 'error.message', DEFAULT_ERROR_MSG)
       }));
     });
@@ -490,13 +491,13 @@ var __vue_render__$1 = function __vue_render__() {
       "active-placeholder": "Use toolbar to upload the video",
       "active-icon": "mdi-arrow-up"
     }
-  }) : _c('div', [_vm.showError ? _c('div', {
+  }) : _c('div', [_vm.error ? _c('div', {
     staticClass: "overlay"
   }, [_c('div', {
     staticClass: "message error--text"
   }, [_c('v-icon', {
     staticClass: "error--text"
-  }, [_vm._v("mdi-alert")]), _vm._v("\n        " + _vm._s(_vm.error || 'Error loading media!') + "\n      ")], 1)]) : _vm._e(), _vm._v(" "), !_vm.showError && _vm.infoMessage ? _c('div', {
+  }, [_vm._v("mdi-alert")]), _vm._v("\n        " + _vm._s(_vm.error || 'Error loading media!') + "\n      ")], 1)]) : _vm._e(), _vm._v(" "), !_vm.error && _vm.infoMessage ? _c('div', {
     staticClass: "overlay"
   }, [_c('div', {
     staticClass: "message info--text"
@@ -518,7 +519,7 @@ var __vue_staticRenderFns__$1 = [];
 var __vue_inject_styles__$1 = undefined;
 /* scoped */
 
-var __vue_scope_id__$1 = "data-v-4e690ea2";
+var __vue_scope_id__$1 = "data-v-2742d551";
 /* module identifier */
 
 var __vue_module_identifier__$1 = undefined;
@@ -626,11 +627,11 @@ var script$2 = {
     },
     accept: {
       type: String,
-      default: null
+      "default": null
     }
   },
   methods: {
-    onClick: function onClick() {
+    triggerUpload: function triggerUpload() {
       this.$refs.uploadInput.click();
     }
   }
@@ -654,7 +655,7 @@ var __vue_render__$2 = function __vue_render__() {
       "text": ""
     },
     on: {
-      "click": _vm.onClick
+      "click": _vm.triggerUpload
     }
   }, 'v-btn', _vm.$attrs, false), [_vm._t("icon", [_c('v-icon', {
     staticClass: "mr-2",
