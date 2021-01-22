@@ -27,10 +27,10 @@
 </template>
 
 <script>
+import createUpload from '../createUpload';
 import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import get from 'lodash/get';
-import createUpload from '../createUpload';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
 const CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
@@ -77,7 +77,7 @@ export default {
       });
     },
     upload() {
-      const { videoId, file, uploadUrl: url} = this;
+      const { videoId, file, uploadUrl: url } = this;
       createUpload({ videoId, file, url })
         .then(() => {
           this.file = null;
@@ -98,7 +98,11 @@ export default {
 
     this.$elementBus.on('save', ({ file }) => {
       this.file = file;
-      this.$emit('save', { fileName: file.name, status: ELEMENT_STATE.UPLOADING });
+      this.$emit('save', {
+        ...this.element.data,
+        fileName: file.name,
+        status: ELEMENT_STATE.UPLOADING
+      });
     });
 
     this.$elementBus.on('error', ({ data }) => {
