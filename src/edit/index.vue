@@ -9,18 +9,14 @@
       active-placeholder="Use toolbar to upload the video"
       active-icon="mdi-arrow-up" />
     <div v-else>
-      <div v-if="error" class="overlay">
-        <div class="message error--text">
-          <v-icon class="error--text">mdi-alert</v-icon>
-          {{ error || 'Error loading media!' }}
-        </div>
-      </div>
-      <div v-if="!error && infoMessage" class="overlay">
-        <div class="message info--text">
-          <v-progress-circular indeterminate color="info" class="mr-4" />
-          {{ infoMessage }}
-        </div>
-      </div>
+      <tce-overlay v-if="error" type="error">
+        <v-icon color="error">mdi-alert</v-icon>
+        {{ error || 'Error loading media!' }}
+      </tce-overlay>
+      <tce-overlay v-if="infoMessage">
+        <v-progress-circular indeterminate color="info" class="mr-4" />
+        {{ infoMessage }}
+      </tce-overlay>
       <div ref="player" class="player"></div>
     </div>
   </div>
@@ -31,6 +27,7 @@ import createUpload from '../createUpload';
 import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import get from 'lodash/get';
+import TceOverlay from './Overlay';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
 const CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
@@ -112,27 +109,13 @@ export default {
       });
     });
   },
-  components: { ElementPlaceholder }
+  components: { ElementPlaceholder, TceOverlay }
 };
 </script>
 
 <style lang="scss" scoped>
 .tce-api-video {
   position: relative;
-}
-
-.overlay {
-  position: absolute;
-  z-index: 3;
-  width: 100%;
-  height: 100%;
-  background: rgba(16, 16, 16, 0.85);
-
-  .message {
-    position: relative;
-    top: 45%;
-    font-size: 1.125rem;
-  }
 }
 
 .player {
