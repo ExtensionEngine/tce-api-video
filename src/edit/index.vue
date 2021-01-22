@@ -27,7 +27,7 @@ import createUpload from '../createUpload';
 import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import get from 'lodash/get';
-import TceOverlay from './Overlay';
+import TceOverlay from './Overlay.vue';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
 const CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
