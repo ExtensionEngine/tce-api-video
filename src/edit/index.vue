@@ -1,7 +1,7 @@
 <template>
   <div class="tce-api-video">
     <element-placeholder
-      v-if="showPlaceholder"
+      v-if="isEmpty"
       :is-focused="isFocused"
       :is-disabled="isDisabled"
       name="Api Video component"
@@ -51,7 +51,7 @@ export default {
     playable: ({ element }) => element.data?.playable,
     status: ({ element }) => element.data?.status,
     error: ({ element }) => element.data?.error,
-    showPlaceholder: ({ error, fileName }) => !error && !fileName,
+    isEmpty: ({ error, fileName }) => !error && !fileName,
     infoMessage: ({ error, status, playable }) => {
       if (error) return;
       if (status === ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
