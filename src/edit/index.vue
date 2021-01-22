@@ -9,9 +9,9 @@
       active-placeholder="Use toolbar to upload the video"
       active-icon="mdi-arrow-up" />
     <div v-else>
-      <tce-overlay v-if="error" type="error">
+      <tce-overlay v-if="error || didUploadFail" type="error">
         <v-icon color="error">mdi-alert</v-icon>
-        {{ error || 'Error loading media!' }}
+        {{ error || 'Video upload failed. Please try again.' }}
       </tce-overlay>
       <tce-overlay v-if="infoMessage">
         <v-progress-circular indeterminate color="info" class="mr-4" />
@@ -30,7 +30,6 @@ import get from 'lodash/get';
 import TceOverlay from './Overlay.vue';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
-const CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
 const UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
 const PROCESSING_MSG = 'Video is processing...';
 
@@ -51,9 +50,10 @@ export default {
     playable: ({ element }) => element.data?.playable,
     status: ({ element }) => element.data?.status,
     error: ({ element }) => element.data?.error,
+    didUploadFail: ({ status, file }) => status === ELEMENT_STATE.UPLOADING && !file,
     isEmpty: ({ error, fileName }) => !error && !fileName,
-    infoMessage: ({ error, status, playable }) => {
-      if (error) return;
+    infoMessage: ({ error, status, playable, didUploadFail }) => {
+      if (error || didUploadFail) return;
       if (status === ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
       if (!playable) return PROCESSING_MSG;
     },
@@ -64,14 +64,6 @@ export default {
       const { player } = this.$refs;
       if (!player) return;
       player.innerHTML = this.embedCode;
-    },
-    checkIfError() {
-      const { status, file, element } = this;
-      if (status !== ELEMENT_STATE.UPLOADING || file) return;
-      this.$emit('save', {
-        ...element.data,
-        error: CANCEL_UPLOAD_ERROR_MSG
-      });
     },
     upload() {
       const { videoId, file, uploadUrl: url } = this;
@@ -90,7 +82,6 @@ export default {
     }
   },
   mounted() {
-    this.checkIfError();
     this.appendVideo();
 
     this.$elementBus.on('save', ({ file }) => {
