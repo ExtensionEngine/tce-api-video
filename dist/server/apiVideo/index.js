@@ -3,13 +3,11 @@
 const Request = require('./request');
 const Videos = require('./video');
 
-function createClient({ apiKey }) {
-  const baseUrl = 'https://ws.api.video';
-  return clientFactory({ baseUrl, apiKey });
-}
+const SANDBOX_URL = 'https://sandbox.api.video';
+const PRODUCTION_URL = 'https://ws.api.video';
 
-function createSandBoxClient({ apiKey }) {
-  const baseUrl = 'https://sandbox.api.video';
+function createClient({ isSandBox, apiKey }) {
+  const baseUrl = isSandBox ? SANDBOX_URL : PRODUCTION_URL;
   return clientFactory({ baseUrl, apiKey });
 }
 
@@ -19,4 +17,4 @@ function clientFactory({ baseUrl, apiKey }) {
   return { videos: new Videos(request) };
 }
 
-module.exports = { createClient, createSandBoxClient };
+module.exports = { createClient };

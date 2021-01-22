@@ -378,7 +378,6 @@
 
   //
   var DEFAULT_ERROR_MSG = 'Something went wrong.';
-  var CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
   var UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
   var PROCESSING_MSG = 'Video is processing...';
   var script$2 = {
@@ -446,23 +445,29 @@
         var element = _ref7.element;
         return (_element$data7 = element.data) === null || _element$data7 === void 0 ? void 0 : _element$data7.error;
       },
-      isEmpty: function isEmpty(_ref8) {
-        var error = _ref8.error,
-            fileName = _ref8.fileName;
+      didUploadFail: function didUploadFail(_ref8) {
+        var status = _ref8.status,
+            file = _ref8.file;
+        return status === shared.ELEMENT_STATE.UPLOADING && !file;
+      },
+      isEmpty: function isEmpty(_ref9) {
+        var error = _ref9.error,
+            fileName = _ref9.fileName;
         return !error && !fileName;
       },
-      infoMessage: function infoMessage(_ref9) {
-        var error = _ref9.error,
-            status = _ref9.status,
-            playable = _ref9.playable;
-        if (error) return;
+      infoMessage: function infoMessage(_ref10) {
+        var error = _ref10.error,
+            status = _ref10.status,
+            playable = _ref10.playable,
+            didUploadFail = _ref10.didUploadFail;
+        if (error || didUploadFail) return;
         if (status === shared.ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
         if (!playable) return PROCESSING_MSG;
       },
-      isPreparedToUpload: function isPreparedToUpload(_ref10) {
-        var videoId = _ref10.videoId,
-            file = _ref10.file,
-            uploadUrl = _ref10.uploadUrl;
+      isPreparedToUpload: function isPreparedToUpload(_ref11) {
+        var videoId = _ref11.videoId,
+            file = _ref11.file,
+            uploadUrl = _ref11.uploadUrl;
         return videoId && file && uploadUrl;
       }
     },
@@ -471,15 +476,6 @@
         var player = this.$refs.player;
         if (!player) return;
         player.innerHTML = this.embedCode;
-      },
-      checkIfError: function checkIfError() {
-        var status = this.status,
-            file = this.file,
-            element = this.element;
-        if (status !== shared.ELEMENT_STATE.UPLOADING || file) return;
-        this.$emit('save', Object.assign({}, element.data, {
-          error: CANCEL_UPLOAD_ERROR_MSG
-        }));
       },
       upload: function upload$1() {
         var _this = this;
@@ -511,10 +507,9 @@
     mounted: function mounted() {
       var _this2 = this;
 
-      this.checkIfError();
       this.appendVideo();
-      this.$elementBus.on('save', function (_ref11) {
-        var file = _ref11.file;
+      this.$elementBus.on('save', function (_ref12) {
+        var file = _ref12.file;
         _this2.file = file;
 
         _this2.$emit('save', Object.assign({}, _this2.element.data, {
@@ -522,8 +517,8 @@
           status: shared.ELEMENT_STATE.UPLOADING
         }));
       });
-      this.$elementBus.on('error', function (_ref12) {
-        var data = _ref12.data;
+      this.$elementBus.on('error', function (_ref13) {
+        var data = _ref13.data;
 
         _this2.$emit('save', Object.assign({}, _this2.element.data, {
           error: get__default['default'](data, 'error.message', DEFAULT_ERROR_MSG)
@@ -558,7 +553,7 @@
         "active-placeholder": "Use toolbar to upload the video",
         "active-icon": "mdi-arrow-up"
       }
-    }) : _c('div', [_vm.error ? _c('tce-overlay', {
+    }) : _c('div', [_vm.error || _vm.didUploadFail ? _c('tce-overlay', {
       attrs: {
         "type": "error"
       }
@@ -566,7 +561,7 @@
       attrs: {
         "color": "error"
       }
-    }, [_vm._v("mdi-alert")]), _vm._v("\n      " + _vm._s(_vm.error || 'Error loading media!') + "\n    ")], 1) : _vm._e(), _vm._v(" "), _vm.infoMessage ? _c('tce-overlay', [_c('v-progress-circular', {
+    }, [_vm._v("mdi-alert")]), _vm._v("\n      " + _vm._s(_vm.error || 'Video upload failed. Please try again.') + "\n    ")], 1) : _vm._e(), _vm._v(" "), _vm.infoMessage ? _c('tce-overlay', [_c('v-progress-circular', {
       staticClass: "mr-4",
       attrs: {
         "indeterminate": "",
@@ -584,7 +579,7 @@
   var __vue_inject_styles__$2 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$2 = "data-v-01b5e64b";
+  var __vue_scope_id__$2 = "data-v-20a85be2";
   /* module identifier */
 
   var __vue_module_identifier__$2 = undefined;
