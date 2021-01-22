@@ -30,7 +30,7 @@
 import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import get from 'lodash/get';
-import upload from '../createUpload';
+import createUpload from '../createUpload';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
 const CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
@@ -60,7 +60,8 @@ export default {
       if (error) return;
       if (status === ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
       if (!playable) return PROCESSING_MSG;
-    }
+    },
+    isPreparedToUpload: ({ videoId, file, uploadUrl }) => videoId && file && uploadUrl
   },
   methods: {
     appendVideo() {
@@ -76,19 +77,21 @@ export default {
         status: ELEMENT_STATE.ERROR,
         error: CANCEL_UPLOAD_ERROR_MSG
       });
-    }
-  },
-  watch: {
-    embedCode: 'appendVideo',
-    videoId() {
-      const { videoId, file, uploadUrl: url } = this;
-      if (!videoId || !file || !url) return;
-      return upload({ url, file, videoId })
+    },
+    upload() {
+      const { videoId, file, uploadUrl: url} = this;
+      createUpload({ videoId, file, url })
         .then(() => {
           this.file = null;
           this.$emit('save', { ...this.element.data, status: ELEMENT_STATE.UPLOADED });
         })
         .catch(err => this.$elementBus.emit('error', err.response));
+    }
+  },
+  watch: {
+    embedCode: 'appendVideo',
+    videoId() {
+      if (this.isPreparedToUpload) this.upload();
     }
   },
   mounted() {
