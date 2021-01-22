@@ -17,7 +17,7 @@ function beforeSave(asset, { config: { tce } }) {
 }
 
 async function afterSave(asset, { config: { tce } }) {
-  const { videoId, playable, error } = asset.data;
+  const { videoId, playable, error, status } = asset.data;
   if (error || !videoId || playable) return asset;
   const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
   if (status === ELEMENT_STATE.UPLOADED) trackPlayableStatus(asset, client);
@@ -26,6 +26,7 @@ async function afterSave(asset, { config: { tce } }) {
 }
 
 async function trackPlayableStatus(asset, client) {
+  const { videoId } = asset.data;
   const interval = setInterval(async () => {
     const {
       ingest: { status },

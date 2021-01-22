@@ -2,13 +2,13 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var get = require('lodash/get');
 var axios = require('axios');
+var get = require('lodash/get');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-var get__default = /*#__PURE__*/_interopDefaultLegacy(get);
 var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
+var get__default = /*#__PURE__*/_interopDefaultLegacy(get);
 
 var name = "tce-api-video";
 var version = "0.0.1";
@@ -20,6 +20,68 @@ var tailor = {
 		forceFullWidth: false
 	}
 };
+
+var CHUNK_SIZE = 64 * 1024 * 1024; // 64MB
+
+function upload(_ref) {
+  var url = _ref.url,
+      file = _ref.file,
+      videoId = _ref.videoId;
+  var size = file.size;
+  if (CHUNK_SIZE > file.size) return post({
+    url: url,
+    videoId: videoId,
+    chunk: file
+  });
+  var chunks = createChunks(file);
+  return Promise.all(chunks.map(function (it) {
+    return post(Object.assign({
+      url: url,
+      videoId: videoId,
+      size: size
+    }, it));
+  }));
+}
+
+function createChunks(file) {
+  var chunks = [];
+  var size = file.size;
+
+  for (var offset = 0; offset < size; offset += CHUNK_SIZE) {
+    var end = Math.min(offset + CHUNK_SIZE, size);
+    var chunk = file.slice(offset, end);
+    chunks.push({
+      chunk: chunk,
+      offset: offset,
+      end: end
+    });
+  }
+
+  return chunks;
+}
+
+function post(_ref2) {
+  var url = _ref2.url,
+      videoId = _ref2.videoId,
+      chunk = _ref2.chunk,
+      size = _ref2.size,
+      offset = _ref2.offset,
+      end = _ref2.end;
+  var headers = {
+    'Content-Type': 'multipart/form-data'
+  };
+
+  if (offset !== undefined && end !== undefined) {
+    headers['Content-Range'] = "bytes ".concat(offset, "-").concat(end - 1, "/").concat(size);
+  }
+
+  var formData = new FormData();
+  formData.append('file', chunk);
+  formData.append('videoId', videoId);
+  return axios__default['default'].post(url, formData, {
+    headers: headers
+  });
+}
 
 var ELEMENT_STATE = {
   UPLOADING: 'UPLOADING',
@@ -257,68 +319,6 @@ var ElementPlaceholder = normalizeComponent_1({
   staticRenderFns: __vue_staticRenderFns__
 }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, undefined, undefined);
 
-var CHUNK_SIZE = 64 * 1024 * 1024; // 64MB
-
-function upload(_ref) {
-  var url = _ref.url,
-      file = _ref.file,
-      videoId = _ref.videoId;
-  var size = file.size;
-  if (CHUNK_SIZE > file.size) return post({
-    url: url,
-    videoId: videoId,
-    chunk: file
-  });
-  var chunks = createChunks(file);
-  return Promise.all(chunks.map(function (it) {
-    return post(Object.assign({
-      url: url,
-      videoId: videoId,
-      size: size
-    }, it));
-  }));
-}
-
-function createChunks(file) {
-  var chunks = [];
-  var size = file.size;
-
-  for (var offset = 0; offset < size; offset += CHUNK_SIZE) {
-    var end = Math.min(offset + CHUNK_SIZE, size);
-    var chunk = file.slice(offset, end);
-    chunks.push({
-      chunk: chunk,
-      offset: offset,
-      end: end
-    });
-  }
-
-  return chunks;
-}
-
-function post(_ref2) {
-  var url = _ref2.url,
-      videoId = _ref2.videoId,
-      chunk = _ref2.chunk,
-      size = _ref2.size,
-      offset = _ref2.offset,
-      end = _ref2.end;
-  var headers = {
-    'Content-Type': 'multipart/form-data'
-  };
-
-  if (offset !== undefined && end !== undefined) {
-    headers['Content-Range'] = "bytes ".concat(offset, "-").concat(end - 1, "/").concat(size);
-  }
-
-  var formData = new FormData();
-  formData.append('file', chunk);
-  formData.append('videoId', videoId);
-  return axios__default['default'].post(url, formData, {
-    headers: headers
-  });
-}
-
 //
 var DEFAULT_ERROR_MSG = 'Something went wrong.';
 var CANCEL_UPLOAD_ERROR_MSG = 'Upload canceled by leaving the page.';
@@ -460,10 +460,10 @@ var script$1 = {
       var file = _ref11.file;
       _this2.file = file;
 
-      _this2.$emit('save', {
+      _this2.$emit('save', Object.assign({}, _this2.element.data, {
         fileName: file.name,
         status: shared.ELEMENT_STATE.UPLOADING
-      });
+      }));
     });
     this.$elementBus.on('error', function (_ref12) {
       var data = _ref12.data;
@@ -528,7 +528,7 @@ var __vue_staticRenderFns__$1 = [];
 var __vue_inject_styles__$1 = undefined;
 /* scoped */
 
-var __vue_scope_id__$1 = "data-v-2742d551";
+var __vue_scope_id__$1 = "data-v-5fcfd8c9";
 /* module identifier */
 
 var __vue_module_identifier__$1 = undefined;
