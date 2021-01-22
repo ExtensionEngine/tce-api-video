@@ -9,13 +9,13 @@
       active-placeholder="Use toolbar to upload the video"
       active-icon="mdi-arrow-up" />
     <div v-else>
-      <div v-if="showError" class="overlay">
+      <div v-if="error" class="overlay">
         <div class="message error--text">
           <v-icon class="error--text">mdi-alert</v-icon>
           {{ error || 'Error loading media!' }}
         </div>
       </div>
-      <div v-if="!showError && infoMessage" class="overlay">
+      <div v-if="!error && infoMessage" class="overlay">
         <div class="message info--text">
           <v-progress-circular indeterminate color="info" class="mr-4" />
           {{ infoMessage }}
@@ -54,7 +54,6 @@ export default {
     playable: ({ element }) => element.data?.playable,
     status: ({ element }) => element.data?.status,
     error: ({ element }) => element.data?.error,
-    showError: ({ status }) => status === ELEMENT_STATE.ERROR,
     showPlaceholder: ({ error, fileName }) => !error && !fileName,
     infoMessage: ({ error, status, playable }) => {
       if (error) return;
@@ -74,7 +73,6 @@ export default {
       if (status !== ELEMENT_STATE.UPLOADING || file) return;
       this.$emit('save', {
         ...element.data,
-        status: ELEMENT_STATE.ERROR,
         error: CANCEL_UPLOAD_ERROR_MSG
       });
     },
@@ -106,7 +104,6 @@ export default {
     this.$elementBus.on('error', ({ data }) => {
       this.$emit('save', {
         ...this.element.data,
-        status: ELEMENT_STATE.ERROR,
         error: get(data, 'error.message', DEFAULT_ERROR_MSG)
       });
     });

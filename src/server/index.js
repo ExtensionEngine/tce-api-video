@@ -4,8 +4,8 @@ const { createSandBoxClient } = require('./apiVideo');
 const { ELEMENT_STATE } = require('../shared');
 
 function beforeSave(asset, { config: { tce } }) {
-  const { videoId, fileName, status } = asset.data;
-  if (isError(status) || videoId || !fileName) return asset;
+  const { videoId, fileName, error } = asset.data;
+  if (error || videoId || !fileName) return asset;
   const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
   return client.videos.create(fileName)
     .then(({ videoId }) => {
@@ -17,8 +17,8 @@ function beforeSave(asset, { config: { tce } }) {
 }
 
 async function afterSave(asset, { config: { tce } }) {
-  const { videoId, playable, status } = asset.data;
-  if (isError(status) || !videoId || playable) return asset;
+  const { videoId, playable, error } = asset.data;
+  if (error || !videoId || playable) return asset;
   const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
   if (status === ELEMENT_STATE.UPLOADED) trackPlayableStatus(asset, client);
   asset.data.uploadUrl = await client.videos.getUploadUrl();
@@ -40,8 +40,8 @@ async function trackPlayableStatus(asset, client) {
 }
 
 function afterLoaded(asset, { config: { tce } }) {
-  const { videoId, playable, status } = asset.data;
-  if (isError(status) || !videoId || !playable) return asset;
+  const { videoId, playable, error } = asset.data;
+  if (error || !videoId || !playable) return asset;
   const client = createSandBoxClient({ apiKey: tce.apiVideoApiKey });
   return client.videos.get(videoId)
     .then(res => {
@@ -52,10 +52,7 @@ function afterLoaded(asset, { config: { tce } }) {
     .catch(error => handleError(error, asset));
 }
 
-const isError = state => state === ELEMENT_STATE.ERROR;
-
 function handleError(error, asset) {
-  asset.data.status = ELEMENT_STATE.ERROR;
   asset.data.error = error.message;
   return asset;
 }
