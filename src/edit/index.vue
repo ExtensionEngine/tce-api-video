@@ -9,27 +9,24 @@
       active-placeholder="Use toolbar to upload the video"
       active-icon="mdi-arrow-up" />
     <div v-else>
-      <tce-overlay v-if="error || didUploadFail" type="error">
-        <v-icon color="error">mdi-alert</v-icon>
-        {{ error || 'Video upload failed. Please try again.' }}
-      </tce-overlay>
-      <tce-overlay v-if="infoMessage">
-        <v-progress-circular indeterminate color="info" class="mr-4" />
-        {{ infoMessage }}
-      </tce-overlay>
+      <tce-overlay
+        v-if="statusMessage"
+        :type="errorMessage ? 'error' : 'info'"
+        :message="statusMessage" />
       <div ref="player" class="player"></div>
     </div>
   </div>
 </template>
 
 <script>
-import createUpload from '../createUpload';
+import createUpload from '../upload';
 import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import get from 'lodash/get';
 import TceOverlay from './Overlay.vue';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
+const UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
 const UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
 const PROCESSING_MSG = 'Video is processing...';
 
@@ -43,31 +40,38 @@ export default {
   },
   data: () => ({ file: null }),
   computed: {
-    videoId: ({ element }) => element.data?.videoId,
-    uploadUrl: ({ element }) => element.data?.uploadUrl,
-    embedCode: ({ element }) => element.data?.embedCode,
-    fileName: ({ element }) => element.data?.fileName,
-    playable: ({ element }) => element.data?.playable,
-    status: ({ element }) => element.data?.status,
-    error: ({ element }) => element.data?.error,
-    didUploadFail: ({ status, file }) => status === ELEMENT_STATE.UPLOADING && !file,
-    isEmpty: ({ error, fileName }) => !error && !fileName,
-    infoMessage: ({ error, status, playable, didUploadFail }) => {
-      if (error || didUploadFail) return;
-      if (status === ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
-      if (!playable) return PROCESSING_MSG;
+    isEmpty() {
+      const { error, fileName } = this.element.data;
+      return !error && !fileName;
     },
-    isPreparedToUpload: ({ videoId, file, uploadUrl }) => videoId && file && uploadUrl
+    didUploadFail() {
+      const { status } = this.element.data;
+      return status === ELEMENT_STATE.UPLOADING && !this.file;
+    },
+    statusMessage: ({ errorMessage, infoMessage }) => errorMessage || infoMessage,
+    errorMessage() {
+      const { error } = this.element.data;
+      return this.didUploadFail ? UPLOAD_FAILED_ERROR_MSG : error;
+    },
+    infoMessage() {
+      const { status, playable } = this.element.data;
+      if (status === ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
+      return playable ? '' : PROCESSING_MSG;
+    },
+    isPreparedToUpload() {
+      const { videoId, uploadUrl } = this.element.data;
+      return videoId && this.file && uploadUrl;
+    }
   },
   methods: {
     appendVideo() {
       const { player } = this.$refs;
       if (!player) return;
-      player.innerHTML = this.embedCode;
+      player.innerHTML = this.element.data?.embedCode;
     },
     upload() {
-      const { videoId, file, uploadUrl: url } = this;
-      createUpload({ videoId, file, url })
+      const { videoId, uploadUrl: url } = this.element.data;
+      createUpload({ videoId, file: this.file, url })
         .then(() => {
           this.file = null;
           this.$emit('save', { ...this.element.data, status: ELEMENT_STATE.UPLOADED });
@@ -76,8 +80,8 @@ export default {
     }
   },
   watch: {
-    embedCode: 'appendVideo',
-    videoId() {
+    'element.data.embedCode': 'appendVideo',
+    'element.data.videoId'() {
       if (this.isPreparedToUpload) this.upload();
     }
   },

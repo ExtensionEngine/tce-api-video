@@ -1,7 +1,9 @@
 <template>
   <div class="overlay d-flex align-center justify-center">
     <div :class="[`${type}--text`, 'message']">
-      <slot></slot>
+      <v-icon v-if="type === 'error'" color="error">mdi-alert</v-icon>
+      <v-progress-circular v-else color="info" class="mr-4" indeterminate />
+      {{ message }}
     </div>
   </div>
 </template>
@@ -10,7 +12,12 @@
 export default {
   name: 'tce-overlay',
   props: {
-    type: { type: String, default: 'info' }
+    type: {
+      type: String,
+      default: 'info',
+      validator: value => ['info', 'error'].includes(value)
+    },
+    message: { type: String, default: '' }
   }
 };
 </script>
