@@ -9,7 +9,7 @@ module.exports = {
   },
   overrides: [{
     files: ['src/**'],
-    ignorePatterns: ['src/server/**'],
+    excludedFiles: 'src/server/**',
     parserOptions: {
       parser: '@babel/eslint-parser',
       sourceType: 'module'
