@@ -1,6 +1,6 @@
 <template>
   <v-btn
-    @click="triggerUpload"
+    @click="$refs.uploadInput.click()"
     v-bind="$attrs"
     color="primary darken-3"
     text
@@ -25,11 +25,6 @@ export default {
   props: {
     label: { type: String, required: true },
     accept: { type: String, default: null }
-  },
-  methods: {
-    triggerUpload() {
-      this.$refs.uploadInput.click();
-    }
   }
 };
 </script>
