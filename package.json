@@ -6,10 +6,12 @@
   "scripts": {
     "prebuild": "del-cli dist",
     "build": "bili",
+    "dev": "bili --watch",
     "lint": "npm run lint:js && npm run lint:scss",
     "lint:js": "eslint --ext .js,.vue .",
     "lint:scss": "stylelint \"**/*.vue\" \"**/*.scss\""
   },
+  "files": ["dist"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ExtensionEngine/tce-api-video.git"
