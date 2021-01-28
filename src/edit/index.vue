@@ -9,10 +9,8 @@
       active-placeholder="Use toolbar to upload the video"
       active-icon="mdi-arrow-up" />
     <div v-else>
-      <tce-overlay
-        v-if="statusMessage"
-        :type="errorMessage ? 'error' : 'info'"
-        :message="statusMessage" />
+      <error-message v-if="errorMessage" :message="errorMessage" />
+      <progress-message v-if="!errorMessage && infoMessage" :message="infoMessage" />
       <div ref="player" class="player"></div>
     </div>
   </div>
@@ -22,8 +20,9 @@
 import createUpload from '../upload';
 import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
+import ErrorMessage from './ErrorMessage.vue';
 import get from 'lodash/get';
-import TceOverlay from './Overlay.vue';
+import ProgressMessage from './ProgressMessage.vue';
 
 const DEFAULT_ERROR_MSG = 'Something went wrong.';
 const UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
@@ -48,7 +47,6 @@ export default {
       const { status } = this.element.data;
       return status === ELEMENT_STATE.UPLOADING && !this.file;
     },
-    statusMessage: ({ errorMessage, infoMessage }) => errorMessage || infoMessage,
     errorMessage() {
       const { error } = this.element.data;
       return this.didUploadFail ? UPLOAD_FAILED_ERROR_MSG : error;
@@ -104,7 +102,7 @@ export default {
       });
     });
   },
-  components: { ElementPlaceholder, TceOverlay }
+  components: { ElementPlaceholder, ErrorMessage, ProgressMessage }
 };
 </script>
 
