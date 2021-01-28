@@ -318,12 +318,21 @@ var ElementPlaceholder = normalizeComponent_1({
 //
 //
 //
+//
+//
 var script$1 = {
   name: 'tce-overlay',
   props: {
     type: {
       type: String,
-      "default": 'info'
+      "default": 'info',
+      validator: function validator(value) {
+        return ['info', 'error'].includes(value);
+      }
+    },
+    message: {
+      type: String,
+      "default": ''
     }
   }
 };
@@ -343,7 +352,17 @@ var __vue_render__$1 = function __vue_render__() {
     staticClass: "overlay d-flex align-center justify-center"
   }, [_c('div', {
     "class": [_vm.type + "--text", 'message']
-  }, [_vm._t("default")], 2)]);
+  }, [_vm.type === 'error' ? _c('v-icon', {
+    attrs: {
+      "color": "error"
+    }
+  }, [_vm._v("mdi-alert")]) : _c('v-progress-circular', {
+    staticClass: "mr-4",
+    attrs: {
+      "color": "info",
+      "indeterminate": ""
+    }
+  }), _vm._v("\n    " + _vm._s(_vm.message) + "\n  ")], 1)]);
 };
 
 var __vue_staticRenderFns__$1 = [];
@@ -352,7 +371,7 @@ var __vue_staticRenderFns__$1 = [];
 var __vue_inject_styles__$1 = undefined;
 /* scoped */
 
-var __vue_scope_id__$1 = "data-v-5492c255";
+var __vue_scope_id__$1 = "data-v-32a12b60";
 /* module identifier */
 
 var __vue_module_identifier__$1 = undefined;
@@ -370,6 +389,7 @@ var TceOverlay = normalizeComponent_1({
 
 //
 var DEFAULT_ERROR_MSG = 'Something went wrong.';
+var UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
 var UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
 var PROCESSING_MSG = 'Video is processing...';
 var script$2 = {
@@ -395,89 +415,56 @@ var script$2 = {
     };
   },
   computed: {
-    videoId: function videoId(_ref) {
-      var _element$data;
-
-      var element = _ref.element;
-      return (_element$data = element.data) === null || _element$data === void 0 ? void 0 : _element$data.videoId;
-    },
-    uploadUrl: function uploadUrl(_ref2) {
-      var _element$data2;
-
-      var element = _ref2.element;
-      return (_element$data2 = element.data) === null || _element$data2 === void 0 ? void 0 : _element$data2.uploadUrl;
-    },
-    embedCode: function embedCode(_ref3) {
-      var _element$data3;
-
-      var element = _ref3.element;
-      return (_element$data3 = element.data) === null || _element$data3 === void 0 ? void 0 : _element$data3.embedCode;
-    },
-    fileName: function fileName(_ref4) {
-      var _element$data4;
-
-      var element = _ref4.element;
-      return (_element$data4 = element.data) === null || _element$data4 === void 0 ? void 0 : _element$data4.fileName;
-    },
-    playable: function playable(_ref5) {
-      var _element$data5;
-
-      var element = _ref5.element;
-      return (_element$data5 = element.data) === null || _element$data5 === void 0 ? void 0 : _element$data5.playable;
-    },
-    status: function status(_ref6) {
-      var _element$data6;
-
-      var element = _ref6.element;
-      return (_element$data6 = element.data) === null || _element$data6 === void 0 ? void 0 : _element$data6.status;
-    },
-    error: function error(_ref7) {
-      var _element$data7;
-
-      var element = _ref7.element;
-      return (_element$data7 = element.data) === null || _element$data7 === void 0 ? void 0 : _element$data7.error;
-    },
-    didUploadFail: function didUploadFail(_ref8) {
-      var status = _ref8.status,
-          file = _ref8.file;
-      return status === shared.ELEMENT_STATE.UPLOADING && !file;
-    },
-    isEmpty: function isEmpty(_ref9) {
-      var error = _ref9.error,
-          fileName = _ref9.fileName;
+    isEmpty: function isEmpty() {
+      var _this$element$data = this.element.data,
+          error = _this$element$data.error,
+          fileName = _this$element$data.fileName;
       return !error && !fileName;
     },
-    infoMessage: function infoMessage(_ref10) {
-      var error = _ref10.error,
-          status = _ref10.status,
-          playable = _ref10.playable,
-          didUploadFail = _ref10.didUploadFail;
-      if (error || didUploadFail) return;
-      if (status === shared.ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
-      if (!playable) return PROCESSING_MSG;
+    didUploadFail: function didUploadFail() {
+      var status = this.element.data.status;
+      return status === shared.ELEMENT_STATE.UPLOADING && !this.file;
     },
-    isPreparedToUpload: function isPreparedToUpload(_ref11) {
-      var videoId = _ref11.videoId,
-          file = _ref11.file,
-          uploadUrl = _ref11.uploadUrl;
-      return videoId && file && uploadUrl;
+    statusMessage: function statusMessage(_ref) {
+      var errorMessage = _ref.errorMessage,
+          infoMessage = _ref.infoMessage;
+      return errorMessage || infoMessage;
+    },
+    errorMessage: function errorMessage() {
+      var error = this.element.data.error;
+      return this.didUploadFail ? UPLOAD_FAILED_ERROR_MSG : error;
+    },
+    infoMessage: function infoMessage() {
+      var _this$element$data2 = this.element.data,
+          status = _this$element$data2.status,
+          playable = _this$element$data2.playable;
+      if (status === shared.ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
+      return playable ? '' : PROCESSING_MSG;
+    },
+    isPreparedToUpload: function isPreparedToUpload() {
+      var _this$element$data3 = this.element.data,
+          videoId = _this$element$data3.videoId,
+          uploadUrl = _this$element$data3.uploadUrl;
+      return videoId && this.file && uploadUrl;
     }
   },
   methods: {
     appendVideo: function appendVideo() {
+      var _this$element$data4;
+
       var player = this.$refs.player;
       if (!player) return;
-      player.innerHTML = this.embedCode;
+      player.innerHTML = (_this$element$data4 = this.element.data) === null || _this$element$data4 === void 0 ? void 0 : _this$element$data4.embedCode;
     },
     upload: function upload$1() {
       var _this = this;
 
-      var videoId = this.videoId,
-          file = this.file,
-          url = this.uploadUrl;
+      var _this$element$data5 = this.element.data,
+          videoId = _this$element$data5.videoId,
+          url = _this$element$data5.uploadUrl;
       upload({
         videoId: videoId,
-        file: file,
+        file: this.file,
         url: url
       }).then(function () {
         _this.file = null;
@@ -491,8 +478,8 @@ var script$2 = {
     }
   },
   watch: {
-    embedCode: 'appendVideo',
-    videoId: function videoId() {
+    'element.data.embedCode': 'appendVideo',
+    'element.data.videoId': function elementDataVideoId() {
       if (this.isPreparedToUpload) this.upload();
     }
   },
@@ -500,8 +487,8 @@ var script$2 = {
     var _this2 = this;
 
     this.appendVideo();
-    this.$elementBus.on('save', function (_ref12) {
-      var file = _ref12.file;
+    this.$elementBus.on('save', function (_ref2) {
+      var file = _ref2.file;
       _this2.file = file;
 
       _this2.$emit('save', Object.assign({}, _this2.element.data, {
@@ -509,8 +496,8 @@ var script$2 = {
         status: shared.ELEMENT_STATE.UPLOADING
       }));
     });
-    this.$elementBus.on('error', function (_ref13) {
-      var data = _ref13.data;
+    this.$elementBus.on('error', function (_ref3) {
+      var data = _ref3.data;
 
       _this2.$emit('save', Object.assign({}, _this2.element.data, {
         error: get(data, 'error.message', DEFAULT_ERROR_MSG)
@@ -545,21 +532,12 @@ var __vue_render__$2 = function __vue_render__() {
       "active-placeholder": "Use toolbar to upload the video",
       "active-icon": "mdi-arrow-up"
     }
-  }) : _c('div', [_vm.error || _vm.didUploadFail ? _c('tce-overlay', {
+  }) : _c('div', [_vm.statusMessage ? _c('tce-overlay', {
     attrs: {
-      "type": "error"
+      "type": _vm.errorMessage ? 'error' : 'info',
+      "message": _vm.statusMessage
     }
-  }, [_c('v-icon', {
-    attrs: {
-      "color": "error"
-    }
-  }, [_vm._v("mdi-alert")]), _vm._v("\n      " + _vm._s(_vm.error || 'Video upload failed. Please try again.') + "\n    ")], 1) : _vm._e(), _vm._v(" "), _vm.infoMessage ? _c('tce-overlay', [_c('v-progress-circular', {
-    staticClass: "mr-4",
-    attrs: {
-      "indeterminate": "",
-      "color": "info"
-    }
-  }), _vm._v("\n      " + _vm._s(_vm.infoMessage) + "\n    ")], 1) : _vm._e(), _vm._v(" "), _c('div', {
+  }) : _vm._e(), _vm._v(" "), _c('div', {
     ref: "player",
     staticClass: "player"
   })], 1)], 1);
@@ -571,7 +549,7 @@ var __vue_staticRenderFns__$2 = [];
 var __vue_inject_styles__$2 = undefined;
 /* scoped */
 
-var __vue_scope_id__$2 = "data-v-20a85be2";
+var __vue_scope_id__$2 = "data-v-67bba36e";
 /* module identifier */
 
 var __vue_module_identifier__$2 = undefined;
@@ -681,11 +659,6 @@ var script$3 = {
       type: String,
       "default": null
     }
-  },
-  methods: {
-    triggerUpload: function triggerUpload() {
-      this.$refs.uploadInput.click();
-    }
   }
 };
 
@@ -707,7 +680,9 @@ var __vue_render__$3 = function __vue_render__() {
       "text": ""
     },
     on: {
-      "click": _vm.triggerUpload
+      "click": function click($event) {
+        return _vm.$refs.uploadInput.click();
+      }
     }
   }, 'v-btn', _vm.$attrs, false), [_vm._t("icon", [_c('v-icon', {
     staticClass: "mr-2",
