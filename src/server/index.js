@@ -16,7 +16,7 @@ function beforeSave(asset, { config: { tce } }) {
       asset.data.videoId = videoId;
       return asset;
     })
-    .catch(error => handleError(error, asset));
+    .catch(error => setAssetError(asset, error));
 }
 
 async function afterSave(asset, { config: { tce } }) {
@@ -26,24 +26,21 @@ async function afterSave(asset, { config: { tce } }) {
   const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
   const isSandBox = apiVideoIsSandbox === 'true';
   const client = createClient({ apiKey, isSandBox });
-  if (status === ELEMENT_STATE.UPLOADED) trackPlayableStatus(asset, client);
+  if (status === ELEMENT_STATE.UPLOADED) startPollingPlayableStatus(asset, client);
   asset.data.uploadUrl = await client.videos.getUploadUrl();
   return asset;
 }
 
-async function trackPlayableStatus(asset, client) {
+async function startPollingPlayableStatus(asset, client) {
   const { videoId } = asset.data;
-  const interval = setInterval(async () => {
-    const {
-      ingest: { status },
-      encoding: { playable }
-    } = await client.videos.status(videoId);
-    if (status === 'uploaded' && playable) {
-      clearInterval(interval);
-      delete asset.data.uploadUrl;
-      await asset.update({ data: { ...asset.data, playable: true } });
-    }
-  }, 5000);
+  const {
+    ingest: { status },
+    encoding: { playable }
+  } = await client.videos.getStatus(videoId);
+  const isPlayable = status === 'uploaded' && playable;
+  if (!isPlayable) return setTimeout(() => startPollingPlayableStatus(asset, client), 5000);
+  delete asset.data.uploadUrl;
+  asset.update({ data: { ...asset.data, playable: true } });
 }
 
 function afterLoaded(asset, { config: { tce } }) {
@@ -59,10 +56,10 @@ function afterLoaded(asset, { config: { tce } }) {
       asset.data.url = res.assets.mp4;
       return asset;
     })
-    .catch(error => handleError(error, asset));
+    .catch(error => setAssetError(asset, error));
 }
 
-function handleError(error, asset) {
+function setAssetError(asset, error) {
   asset.data.error = error.message;
   return asset;
 }

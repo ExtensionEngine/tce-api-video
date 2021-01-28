@@ -32,7 +32,7 @@ class Videos {
     }, { headers });
   }
 
-  async status(id) {
+  async getStatus(id) {
     const { tokenType, accessToken } = await this._request.authenticate();
     return this._request.get(`videos/${id}/status`, {
       headers: {
