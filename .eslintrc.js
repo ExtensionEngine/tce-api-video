@@ -4,7 +4,6 @@ module.exports = {
   root: true,
   extends: '@extensionengine',
   rules: {
-    'vue/comment-directive': 'off',
     'vue/component-definition-name-casing': ['error', 'kebab-case']
   },
   overrides: [{
