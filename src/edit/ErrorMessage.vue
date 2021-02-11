@@ -1,6 +1,6 @@
 <template>
   <tce-overlay>
-    <div class="error--text message">
+    <div class="message error--text">
       <v-icon color="error">mdi-alert</v-icon>
       {{ message }}
     </div>

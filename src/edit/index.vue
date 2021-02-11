@@ -10,7 +10,7 @@
       active-icon="mdi-arrow-up" />
     <div v-else>
       <error-message v-if="errorMessage" :message="errorMessage" />
-      <progress-message v-if="!errorMessage && infoMessage" :message="infoMessage" />
+      <progress-message v-else-if="infoMessage" :message="infoMessage" />
       <div ref="player" class="player"></div>
     </div>
   </div>
@@ -56,7 +56,7 @@ export default {
       if (status === ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
       return playable ? '' : PROCESSING_MSG;
     },
-    isPreparedToUpload() {
+    isReadyToUpload() {
       const { videoId, uploadUrl } = this.element.data;
       return videoId && this.file && uploadUrl;
     }
@@ -80,7 +80,7 @@ export default {
   watch: {
     'element.data.embedCode': 'appendVideo',
     'element.data.videoId'() {
-      if (this.isPreparedToUpload) this.upload();
+      if (this.isReadyToUpload) this.upload();
     }
   },
   mounted() {

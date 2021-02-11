@@ -12,8 +12,8 @@
     <input
       ref="uploadInput"
       @change="$emit('change', $event)"
-      type="file"
       :accept="accept"
+      type="file"
       class="d-none">
   </v-btn>
 </template>
@@ -24,7 +24,7 @@ export default {
   inheritAttrs: false,
   props: {
     label: { type: String, required: true },
-    accept: { type: String, default: null }
+    accept: { type: String, default: 'video/*' }
   }
 };
 </script>

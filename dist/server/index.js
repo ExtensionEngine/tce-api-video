@@ -1,7 +1,8 @@
 'use strict';
 
-const { createClient } = require('./apiVideo');
+const { createClient, getUploadUrl } = require('./apiVideo');
 const { ELEMENT_STATE } = require('../shared');
+const omit = require('lodash/omit');
 
 function beforeSave(asset, { config: { tce } }) {
   const { videoId, fileName, error } = asset.data;
@@ -10,13 +11,12 @@ function beforeSave(asset, { config: { tce } }) {
   const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
   const isSandBox = apiVideoIsSandbox === 'true';
   const client = createClient({ apiKey, isSandBox });
-  return client.videos.create(fileName)
+  return client.videos.create(fileName, { public: false })
     .then(({ videoId }) => {
-      asset.data.playable = false;
       asset.data.videoId = videoId;
       return asset;
     })
-    .catch(error => setAssetError(asset, error));
+    .catch(err => setAssetError(asset, err));
 }
 
 async function afterSave(asset, { config: { tce } }) {
@@ -27,7 +27,7 @@ async function afterSave(asset, { config: { tce } }) {
   const isSandBox = apiVideoIsSandbox === 'true';
   const client = createClient({ apiKey, isSandBox });
   if (status === ELEMENT_STATE.UPLOADED) startPollingPlayableStatus(asset, client);
-  asset.data.uploadUrl = await client.videos.getUploadUrl();
+  asset.data.uploadUrl = await getUploadUrl(client);
   return asset;
 }
 
@@ -38,9 +38,10 @@ async function startPollingPlayableStatus(asset, client) {
     encoding: { playable }
   } = await client.videos.getStatus(videoId);
   const isPlayable = status === 'uploaded' && playable;
-  if (!isPlayable) return setTimeout(() => startPollingPlayableStatus(asset, client), 5000);
-  delete asset.data.uploadUrl;
-  asset.update({ data: { ...asset.data, playable: true } });
+  if (!isPlayable) {
+    return setTimeout(() => startPollingPlayableStatus(asset, client), 5000);
+  }
+  asset.update({ data: { ...omit(asset.data, ['uploadUrl']), playable: true } });
 }
 
 function afterLoaded(asset, { config: { tce } }) {
