@@ -8,15 +8,16 @@
       icon="mdi-video-image"
       active-placeholder="Use toolbar to upload the video"
       active-icon="mdi-arrow-up" />
-    <div v-else>
+    <div v-else class="player-container">
       <error-message v-if="errorMessage" :message="errorMessage" />
       <progress-message v-else-if="infoMessage" :message="infoMessage" />
-      <div ref="player" class="player"></div>
+      <api-video-player v-bind="element.data" />
     </div>
   </div>
 </template>
 
 <script>
+import ApiVideoPlayer from './ApiVideoPlayer.vue';
 import createUpload from '../upload';
 import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
@@ -54,7 +55,7 @@ export default {
     infoMessage() {
       const { status, playable } = this.element.data;
       if (status === ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
-      return playable ? '' : PROCESSING_MSG;
+      return !playable && PROCESSING_MSG;
     },
     isReadyToUpload() {
       const { videoId, uploadUrl } = this.element.data;
@@ -62,14 +63,9 @@ export default {
     }
   },
   methods: {
-    appendVideo() {
-      const { player } = this.$refs;
-      if (!player) return;
-      player.innerHTML = this.element.data?.embedCode;
-    },
     upload() {
       const { videoId, uploadUrl: url } = this.element.data;
-      createUpload({ videoId, file: this.file, url })
+      return createUpload({ videoId, file: this.file, url })
         .then(() => {
           this.file = null;
           this.$emit('save', { ...this.element.data, status: ELEMENT_STATE.UPLOADED });
@@ -78,14 +74,11 @@ export default {
     }
   },
   watch: {
-    'element.data.embedCode': 'appendVideo',
     'element.data.videoId'() {
       if (this.isReadyToUpload) this.upload();
     }
   },
   mounted() {
-    this.appendVideo();
-
     this.$elementBus.on('save', ({ file }) => {
       this.file = file;
       this.$emit('save', {
@@ -102,17 +95,17 @@ export default {
       });
     });
   },
-  components: { ElementPlaceholder, ErrorMessage, ProgressMessage }
+  components: {
+    ApiVideoPlayer,
+    ElementPlaceholder,
+    ErrorMessage,
+    ProgressMessage
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-.tce-api-video {
+.player-container {
   position: relative;
-}
-
-.player {
-  height: 25.625rem;
-  background: #000;
 }
 </style>

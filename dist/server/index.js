@@ -16,7 +16,7 @@ function beforeSave(asset, { config: { tce } }) {
       asset.data.videoId = videoId;
       return asset;
     })
-    .catch(err => setAssetError(asset, err));
+    .catch(error => setAssetError(asset, error));
 }
 
 async function afterSave(asset, { config: { tce } }) {
