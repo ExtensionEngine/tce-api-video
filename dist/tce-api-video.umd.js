@@ -550,7 +550,7 @@
 
   //
   var UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
-  var UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
+  var UPLOADING_MSG = 'Video is uploading. Please do not leave the page.';
   var PROCESSING_MSG = 'Video is processing...';
   var script$5 = {
     name: 'tce-api-video',
@@ -715,7 +715,7 @@
   var __vue_inject_styles__$5 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$5 = "data-v-567ade4c";
+  var __vue_scope_id__$5 = "data-v-36e4bf8e";
   /* module identifier */
 
   var __vue_module_identifier__$5 = undefined;

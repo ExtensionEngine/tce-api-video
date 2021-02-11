@@ -34,7 +34,7 @@ import get from 'lodash/get';
 import ProgressMessage from './ProgressMessage.vue';
 
 const UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
-const UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
+const UPLOADING_MSG = 'Video is uploading. Please do not leave the page.';
 const PROCESSING_MSG = 'Video is processing...';
 
 export default {
