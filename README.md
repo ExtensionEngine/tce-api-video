@@ -1,4 +1,4 @@
-# @extensionengine/tce-sproutvideo
+# @extensionengine/tce-api-video
 
 To make this element work, the following env variables must be provided in the tailor/.env file:\
 - `TCE_API_VIDEO_API_KEY`: `String` (Required) - Api key

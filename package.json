@@ -2,7 +2,20 @@
   "name": "tce-api-video",
   "version": "0.0.1",
   "description": "Tailor content element for Api video",
-  "main": "src/index.js",
+  "homepage": "https://github.com/ExtensionEngine/tce-api-video#readme",
+  "bugs": {
+    "url": "https://github.com/ExtensionEngine/tce-api-video/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ExtensionEngine/tce-api-video.git"
+  },
+  "license": "MIT",
+  "author": "ExtensionEngine <info@extensionengine.com>",
+  "main": "dist/tce-api-video.umd.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "prebuild": "del-cli dist",
     "build": "bili",
@@ -11,17 +24,11 @@
     "lint:js": "eslint --ext .js,.vue .",
     "lint:scss": "stylelint \"**/*.vue\" \"**/*.scss\""
   },
-  "files": ["dist"],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ExtensionEngine/tce-api-video.git"
+  "dependencies": {
+    "@api.video/nodejs-sdk": "^1.9.8",
+    "axios": "^0.21.1",
+    "lodash": "^4.17.20"
   },
-  "author": "ExtensionEngine <info@extensionengine.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ExtensionEngine/tce-api-video/issues"
-  },
-  "homepage": "https://github.com/ExtensionEngine/tce-api-video#readme",
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.1",
     "@babel/eslint-plugin": "^7.12.1",
@@ -59,10 +66,5 @@
       "icon": "mdi-video",
       "forceFullWidth": false
     }
-  },
-  "dependencies": {
-    "axios": "^0.21.1",
-    "http-errors": "^1.8.0",
-    "lodash": "^4.17.20"
   }
 }
