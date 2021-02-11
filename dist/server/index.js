@@ -1,7 +1,8 @@
 'use strict';
 
 const { createClient, getUploadUrl } = require('./apiVideo');
-const { ELEMENT_STATE } = require('../shared');
+const { DEFAULT_ERROR_MSG, ELEMENT_STATE } = require('../shared');
+const get = require('lodash/get');
 const omit = require('lodash/omit');
 
 function beforeSave(asset, { config: { tce } }) {
@@ -61,7 +62,7 @@ function afterLoaded(asset, { config: { tce } }) {
 }
 
 function setAssetError(asset, error) {
-  asset.data.error = error.message;
+  asset.data.error = get(error, 'response.body.title', DEFAULT_ERROR_MSG);
   return asset;
 }
 

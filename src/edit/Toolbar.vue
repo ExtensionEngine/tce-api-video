@@ -9,7 +9,6 @@
         v-if="!fileName"
         @change="upload"
         label="Upload Api video"
-        accept="video/mp4"
         class="upload-btn" />
       <v-text-field
         v-else
@@ -38,7 +37,7 @@ export default {
     upload(e) {
       const [file] = e.target.files;
       if (file.type !== MP4_MIME_TYPE) {
-        this.$elementBus.emit('error', { error: { message: FORMAT_ERROR } });
+        this.$elementBus.emit('error', FORMAT_ERROR);
         return;
       }
       this.$elementBus.emit('save', { file });

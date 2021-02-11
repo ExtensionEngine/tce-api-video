@@ -12,6 +12,16 @@ var tailor = {
 	}
 };
 
+var ELEMENT_STATE = {
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED'
+};
+var DEFAULT_ERROR_MSG = 'Something went wrong.';
+var shared = {
+  ELEMENT_STATE: ELEMENT_STATE,
+  DEFAULT_ERROR_MSG: DEFAULT_ERROR_MSG
+};
+
 //
 //
 //
@@ -224,14 +234,6 @@ function post(_ref2) {
     headers: headers
   });
 }
-
-var ELEMENT_STATE = {
-  UPLOADING: 'UPLOADING',
-  UPLOADED: 'UPLOADED'
-};
-var shared = {
-  ELEMENT_STATE: ELEMENT_STATE
-};
 
 //
 //
@@ -539,7 +541,6 @@ var ProgressMessage = normalizeComponent_1({
 }, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, undefined, undefined);
 
 //
-var DEFAULT_ERROR_MSG = 'Something went wrong.';
 var UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
 var UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
 var PROCESSING_MSG = 'Video is processing...';
@@ -562,7 +563,9 @@ var script$5 = {
   },
   data: function data() {
     return {
-      file: null
+      file: null,
+      error: null,
+      showAlert: false
     };
   },
   computed: {
@@ -612,7 +615,11 @@ var script$5 = {
           status: shared.ELEMENT_STATE.UPLOADED
         }));
       })["catch"](function (err) {
-        return _this.$elementBus.emit('error', err.response);
+        _this.$$emit('save', Object.assign({}, _this.element.data, {
+          error: get(err, 'response.data.title', shared.DEFAULT_ERROR_MSG),
+          status: null,
+          fileName: null
+        }));
       });
     }
   },
@@ -633,12 +640,9 @@ var script$5 = {
         status: shared.ELEMENT_STATE.UPLOADING
       }));
     });
-    this.$elementBus.on('error', function (_ref2) {
-      var data = _ref2.data;
-
-      _this2.$emit('save', Object.assign({}, _this2.element.data, {
-        error: get(data, 'error.message', DEFAULT_ERROR_MSG)
-      }));
+    this.$elementBus.on('error', function (error) {
+      _this2.showAlert = true;
+      _this2.error = typeof error === 'string' ? error : get(error, 'response.data.error.message', shared.DEFAULT_ERROR_MSG);
     });
   },
   components: {
@@ -662,7 +666,20 @@ var __vue_render__$5 = function __vue_render__() {
 
   return _c('div', {
     staticClass: "tce-api-video"
-  }, [_vm.isEmpty ? _c('element-placeholder', {
+  }, [_vm.error ? _c('v-alert', {
+    staticClass: "text-left",
+    attrs: {
+      "type": "error",
+      "dismissible": ""
+    },
+    model: {
+      value: _vm.showAlert,
+      callback: function callback($$v) {
+        _vm.showAlert = $$v;
+      },
+      expression: "showAlert"
+    }
+  }, [_vm._v("\n    " + _vm._s(_vm.error) + "\n  ")]) : _vm._e(), _vm._v(" "), _vm.isEmpty ? _c('element-placeholder', {
     attrs: {
       "is-focused": _vm.isFocused,
       "is-disabled": _vm.isDisabled,
@@ -690,7 +707,7 @@ var __vue_staticRenderFns__$5 = [];
 var __vue_inject_styles__$5 = undefined;
 /* scoped */
 
-var __vue_scope_id__$5 = "data-v-0376722a";
+var __vue_scope_id__$5 = "data-v-567ade4c";
 /* module identifier */
 
 var __vue_module_identifier__$5 = undefined;
@@ -798,7 +815,7 @@ var script$6 = {
     },
     accept: {
       type: String,
-      "default": 'video/*'
+      "default": 'video/mp4'
     }
   }
 };
@@ -892,11 +909,7 @@ var script$7 = {
           file = _e$target$files[0];
 
       if (file.type !== MP4_MIME_TYPE) {
-        this.$elementBus.emit('error', {
-          error: {
-            message: FORMAT_ERROR
-          }
-        });
+        this.$elementBus.emit('error', FORMAT_ERROR);
         return;
       }
 
@@ -934,8 +947,7 @@ var __vue_render__$7 = function __vue_render__() {
   }, [!_vm.fileName ? _c('upload-btn', {
     staticClass: "upload-btn",
     attrs: {
-      "label": "Upload Api video",
-      "accept": "video/mp4"
+      "label": "Upload Api video"
     },
     on: {
       "change": _vm.upload
@@ -956,7 +968,7 @@ var __vue_staticRenderFns__$7 = [];
 var __vue_inject_styles__$7 = undefined;
 /* scoped */
 
-var __vue_scope_id__$7 = "data-v-3a795ea2";
+var __vue_scope_id__$7 = "data-v-4e60f64d";
 /* module identifier */
 
 var __vue_module_identifier__$7 = undefined;

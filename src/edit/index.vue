@@ -1,5 +1,13 @@
 <template>
   <div class="tce-api-video">
+    <v-alert
+      v-if="error"
+      v-model="showAlert"
+      type="error"
+      dismissible
+      class="text-left">
+      {{ error }}
+    </v-alert>
     <element-placeholder
       v-if="isEmpty"
       :is-focused="isFocused"
@@ -17,15 +25,14 @@
 </template>
 
 <script>
+import { DEFAULT_ERROR_MSG, ELEMENT_STATE } from '../shared';
 import ApiVideoPlayer from './ApiVideoPlayer.vue';
 import createUpload from '../upload';
-import { ELEMENT_STATE } from '../shared';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import get from 'lodash/get';
 import ProgressMessage from './ProgressMessage.vue';
 
-const DEFAULT_ERROR_MSG = 'Something went wrong.';
 const UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
 const UPLOADING_MSG = 'Video is uploading... Do not leave the page.';
 const PROCESSING_MSG = 'Video is processing...';
@@ -38,7 +45,7 @@ export default {
     isFocused: { type: Boolean, default: false },
     isDisabled: { type: Boolean, default: false }
   },
-  data: () => ({ file: null }),
+  data: () => ({ file: null, error: null, showAlert: false }),
   computed: {
     isEmpty() {
       const { error, fileName } = this.element.data;
@@ -70,7 +77,14 @@ export default {
           this.file = null;
           this.$emit('save', { ...this.element.data, status: ELEMENT_STATE.UPLOADED });
         })
-        .catch(err => this.$elementBus.emit('error', err.response));
+        .catch(err => {
+          this.$$emit('save', {
+            ...this.element.data,
+            error: get(err, 'response.data.title', DEFAULT_ERROR_MSG),
+            status: null,
+            fileName: null
+          });
+        });
     }
   },
   watch: {
@@ -88,11 +102,11 @@ export default {
       });
     });
 
-    this.$elementBus.on('error', ({ data }) => {
-      this.$emit('save', {
-        ...this.element.data,
-        error: get(data, 'error.message', DEFAULT_ERROR_MSG)
-      });
+    this.$elementBus.on('error', error => {
+      this.showAlert = true;
+      this.error = typeof error === 'string'
+        ? error
+        : get(error, 'response.data.error.message', DEFAULT_ERROR_MSG);
     });
   },
   components: {

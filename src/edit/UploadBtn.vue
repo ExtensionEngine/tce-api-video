@@ -24,7 +24,7 @@ export default {
   inheritAttrs: false,
   props: {
     label: { type: String, required: true },
-    accept: { type: String, default: 'video/*' }
+    accept: { type: String, default: 'video/mp4' }
   }
 };
 </script>

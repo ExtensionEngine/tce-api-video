@@ -3,4 +3,6 @@ const ELEMENT_STATE = {
   UPLOADED: 'UPLOADED'
 };
 
-module.exports = { ELEMENT_STATE };
+const DEFAULT_ERROR_MSG = 'Something went wrong.';
+
+module.exports = { ELEMENT_STATE, DEFAULT_ERROR_MSG };
