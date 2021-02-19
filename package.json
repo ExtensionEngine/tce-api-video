@@ -25,7 +25,7 @@
     "lint:scss": "stylelint \"**/*.vue\" \"**/*.scss\""
   },
   "dependencies": {
-    "@api.video/nodejs-sdk": "^1.9.8",
+    "@api.video/nodejs-sdk": "^1.10.1",
     "axios": "^0.21.1",
     "lodash": "^4.17.20"
   },
