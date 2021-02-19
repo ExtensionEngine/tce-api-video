@@ -694,7 +694,7 @@ var script$6 = {
           status: shared.ELEMENT_STATE.UPLOADED
         }));
       })["catch"](function (err) {
-        _this.$$emit('save', Object.assign({}, _this.element.data, {
+        _this.$emit('save', Object.assign({}, _this.element.data, {
           error: get__default['default'](err, 'response.data.title', shared.DEFAULT_ERROR_MSG),
           status: null,
           fileName: null
@@ -794,7 +794,7 @@ var __vue_staticRenderFns__$6 = [];
 var __vue_inject_styles__$6 = undefined;
 /* scoped */
 
-var __vue_scope_id__$6 = "data-v-164eccc0";
+var __vue_scope_id__$6 = "data-v-6ef86bc0";
 /* module identifier */
 
 var __vue_module_identifier__$6 = undefined;

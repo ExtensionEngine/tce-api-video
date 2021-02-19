@@ -83,7 +83,7 @@ export default {
           this.$emit('save', { ...this.element.data, status: ELEMENT_STATE.UPLOADED });
         })
         .catch(err => {
-          this.$$emit('save', {
+          this.$emit('save', {
             ...this.element.data,
             error: get(err, 'response.data.title', DEFAULT_ERROR_MSG),
             status: null,
