@@ -3,36 +3,52 @@
 const { createClient, getUploadUrl } = require('./apiVideo');
 const { DEFAULT_ERROR_MSG, ELEMENT_STATE } = require('../shared');
 const get = require('lodash/get');
-const omit = require('lodash/omit');
+const unset = require('lodash/unset');
 
 function beforeSave(asset, { config: { tce } }) {
   const { videoId, fileName, error } = asset.data;
   const isUploadedOrError = error || videoId || !fileName;
-  if (isUploadedOrError) return asset;
+  if (isUploadedOrError) {
+    deleteTemporaryAssetProps(asset);
+    return asset;
+  }
   const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
   const isSandBox = apiVideoIsSandbox === 'true';
   const client = createClient({ apiKey, isSandBox });
   return client.videos.create(fileName, { public: false })
     .then(({ videoId }) => {
       asset.data.videoId = videoId;
+      deleteTemporaryAssetProps(asset);
       return asset;
     })
     .catch(error => setAssetError(asset, error));
 }
 
-async function afterSave(asset, { config: { tce } }) {
+function deleteTemporaryAssetProps(asset) {
+  const temporaryProps = [
+    'embedCode',
+    'uploadUrl',
+    'url'
+  ];
+  temporaryProps.map(prop => unset(asset.data, prop));
+  return asset;
+}
+
+async function afterSave(asset, { config: { tce } }, options = {}) {
   const { videoId, playable, error, status } = asset.data;
   const isAvailableOrError = error || !videoId || playable;
   if (isAvailableOrError) return asset;
   const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
   const isSandBox = apiVideoIsSandbox === 'true';
   const client = createClient({ apiKey, isSandBox });
-  if (status === ELEMENT_STATE.UPLOADED) startPollingPlayableStatus(asset, client);
+  if (status === ELEMENT_STATE.UPLOADED) {
+    startPollingPlayableStatus(asset, client, options.context);
+  }
   asset.data.uploadUrl = await getUploadUrl(client);
   return asset;
 }
 
-async function startPollingPlayableStatus(asset, client) {
+async function startPollingPlayableStatus(asset, client, context) {
   const { videoId } = asset.data;
   const {
     ingest: { status },
@@ -40,9 +56,9 @@ async function startPollingPlayableStatus(asset, client) {
   } = await client.videos.getStatus(videoId);
   const isPlayable = status === 'uploaded' && playable;
   if (!isPlayable) {
-    return setTimeout(() => startPollingPlayableStatus(asset, client), 5000);
+    return setTimeout(() => startPollingPlayableStatus(asset, client, context), 5000);
   }
-  asset.update({ data: { ...omit(asset.data, ['uploadUrl']), playable: true } });
+  asset.update({ data: { ...asset.data, playable: true } }, context);
 }
 
 function afterLoaded(asset, { config: { tce } }) {
