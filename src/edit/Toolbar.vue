@@ -52,14 +52,6 @@ export default {
   min-width: 23.875rem;
 }
 
-.upload-btn ::v-deep .v-btn {
-  height: 100%;
-
-  &__content {
-    padding: 1.5rem 0;
-  }
-}
-
 .v-text-field {
   min-width: 21.875rem;
   margin: 0.5rem 0.75rem 0 1.75rem;

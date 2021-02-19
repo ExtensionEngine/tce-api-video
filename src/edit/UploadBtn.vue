@@ -4,7 +4,7 @@
     v-bind="$attrs"
     color="primary darken-3"
     text
-    class="text-uppercase">
+    class="upload-btn text-uppercase">
     <slot name="icon">
       <v-icon color="secondary darken-1" class="mr-2">mdi-cloud-upload-outline</v-icon>
     </slot>
@@ -28,3 +28,9 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.upload-btn.v-btn {
+  height: 100%;
+}
+</style>
