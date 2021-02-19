@@ -26,7 +26,7 @@ export default {
 
 <style lang="scss" scoped>
 .player {
-  height: 25.625rem;
+  height: 22.5rem;
   background: #000;
 }
 </style>
