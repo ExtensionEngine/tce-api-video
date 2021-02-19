@@ -1,6 +1,8 @@
-.player[data-v-359d7993]{height:25.625rem;background:#000}
+.player[data-v-db9ad38e]{height:25.625rem;background:#000}
 .overlay[data-v-28420ade]{position:absolute;z-index:3;width:100%;height:100%;background:rgba(16,16,16,.85)}
 .message[data-v-576a2d2e]{font-size:1.125rem}
+.message[data-v-4e41c6e0]{border-radius:2px;font-size:1.125rem}
 .message[data-v-2cf5ce5b]{font-size:1.125rem}
-.player-container[data-v-36e4bf8e]{position:relative}
-.v-toolbar__title[data-v-4e60f64d]{min-width:23.875rem}.upload-btn[data-v-4e60f64d]  .v-btn{height:100%}.upload-btn[data-v-4e60f64d]  .v-btn__content{padding:1.5rem 0}.v-text-field[data-v-4e60f64d]{min-width:21.875rem;margin:.5rem .75rem 0 1.75rem}
+.player-container[data-v-164eccc0]{position:relative}
+.upload-btn.v-btn[data-v-54b9862e]{height:100%}
+.v-toolbar__title[data-v-e7641378]{min-width:23.875rem}.v-text-field[data-v-e7641378]{min-width:21.875rem;margin:.5rem .75rem 0 1.75rem}
