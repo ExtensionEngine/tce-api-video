@@ -19,6 +19,9 @@
     <div v-else class="player-container">
       <error-message v-if="errorMessage" :message="errorMessage" />
       <progress-message v-else-if="infoMessage" :message="infoMessage" />
+      <preview-overlay v-else :show="!isFocusedOrDisabled">
+        Double click to preview
+      </preview-overlay>
       <api-video-player v-bind="element.data" />
     </div>
   </div>
@@ -31,6 +34,7 @@ import createUpload from '../upload';
 import ElementPlaceholder from '../tce-core/ElementPlaceholder.vue';
 import ErrorMessage from './ErrorMessage.vue';
 import get from 'lodash/get';
+import PreviewOverlay from '../tce-core/PreviewOverlay.vue';
 import ProgressMessage from './ProgressMessage.vue';
 
 const UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
@@ -67,7 +71,8 @@ export default {
     isReadyToUpload() {
       const { videoId, uploadUrl } = this.element.data;
       return videoId && this.file && uploadUrl;
-    }
+    },
+    isFocusedOrDisabled: ({ isDisabled, isFocused }) => isFocused || isDisabled
   },
   methods: {
     upload() {
@@ -90,6 +95,9 @@ export default {
   watch: {
     'element.data.videoId'() {
       if (this.isReadyToUpload) this.upload();
+    },
+    isFocusedOrDisabled(value) {
+      if (!value) this.$emit('save', this.element.data);
     }
   },
   mounted() {
@@ -113,7 +121,8 @@ export default {
     ApiVideoPlayer,
     ElementPlaceholder,
     ErrorMessage,
-    ProgressMessage
+    ProgressMessage,
+    PreviewOverlay
   }
 };
 </script>
