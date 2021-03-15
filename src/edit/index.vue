@@ -1,7 +1,6 @@
 <template>
   <div class="tce-api-video">
     <v-alert
-      v-if="error"
       v-model="showAlert"
       type="error"
       dismissible

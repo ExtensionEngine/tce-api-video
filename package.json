@@ -57,7 +57,7 @@
   },
   "peerDependencies": {
     "vee-validate": "^3.4.5",
-    "vuetify": "^2.3.21"
+    "vuetify": "^2.2.20"
   },
   "tailor": {
     "label": "Api video",

@@ -749,7 +749,7 @@ var __vue_render__$6 = function __vue_render__() {
 
   return _c('div', {
     staticClass: "tce-api-video"
-  }, [_vm.error ? _c('v-alert', {
+  }, [_c('v-alert', {
     staticClass: "text-left",
     attrs: {
       "type": "error",
@@ -762,7 +762,7 @@ var __vue_render__$6 = function __vue_render__() {
       },
       expression: "showAlert"
     }
-  }, [_vm._v("\n    " + _vm._s(_vm.error) + "\n  ")]) : _vm._e(), _vm._v(" "), _vm.isEmpty ? _c('element-placeholder', {
+  }, [_vm._v("\n    " + _vm._s(_vm.error) + "\n  ")]), _vm._v(" "), _vm.isEmpty ? _c('element-placeholder', {
     attrs: {
       "is-focused": _vm.isFocused,
       "is-disabled": _vm.isDisabled,
@@ -794,7 +794,7 @@ var __vue_staticRenderFns__$6 = [];
 var __vue_inject_styles__$6 = undefined;
 /* scoped */
 
-var __vue_scope_id__$6 = "data-v-6ef86bc0";
+var __vue_scope_id__$6 = "data-v-421fe3ef";
 /* module identifier */
 
 var __vue_module_identifier__$6 = undefined;

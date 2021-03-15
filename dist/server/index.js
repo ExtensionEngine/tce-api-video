@@ -25,12 +25,8 @@ function beforeSave(asset, { config: { tce } }) {
 }
 
 function deleteTemporaryAssetProps(asset) {
-  const temporaryProps = [
-    'embedCode',
-    'uploadUrl',
-    'url'
-  ];
-  temporaryProps.map(prop => unset(asset.data, prop));
+  const temporaryProps = ['embedCode', 'uploadUrl', 'url'];
+  temporaryProps.forEach(prop => unset(asset.data, prop));
   return asset;
 }
 
