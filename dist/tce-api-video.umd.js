@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('axios'), require('lodash/get')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'axios', 'lodash/get'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['tce-api-video'] = {}), global.axios, global.get));
-}(this, (function (exports, axios, get) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@api.video/player-sdk'), require('axios'), require('lodash/get')) :
+  typeof define === 'function' && define.amd ? define(['exports', '@api.video/player-sdk', 'axios', 'lodash/get'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['tce-api-video'] = {}), global.playerSdk, global.axios, global.get));
+}(this, (function (exports, playerSdk, axios, get) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -31,29 +31,35 @@
   };
 
   //
-  //
-  //
-  //
   var script = {
     name: 'api-video-player',
     props: {
+      videoId: {
+        type: String,
+        "default": null
+      },
       embedCode: {
         type: String,
         "default": null
       }
     },
     methods: {
-      setVideo: function setVideo() {
+      setEmbeddedPlayer: function setEmbeddedPlayer() {
+        if (!this.embedCode) return;
         var player = this.$refs.player;
-        if (!player) return;
         player.innerHTML = this.embedCode;
+        player.firstChild.id = this.videoId;
+        this.player = new playerSdk.PlayerSdk("#".concat(this.videoId));
+      },
+      pause: function pause() {
+        this.player.pause();
       }
     },
     watch: {
-      embedCode: 'setVideo'
+      embedCode: 'setEmbeddedPlayer'
     },
     mounted: function mounted() {
-      this.setVideo();
+      this.setEmbeddedPlayer();
     }
   };
 
@@ -165,7 +171,7 @@
   var __vue_inject_styles__ = undefined;
   /* scoped */
 
-  var __vue_scope_id__ = "data-v-2223be9c";
+  var __vue_scope_id__ = "data-v-2a45b45d";
   /* module identifier */
 
   var __vue_module_identifier__ = undefined;
@@ -706,7 +712,7 @@
         if (this.isReadyToUpload) this.upload();
       },
       isFocusedOrDisabled: function isFocusedOrDisabled(value) {
-        if (!value) this.$emit('save', this.element.data);
+        if (!value) this.$refs.player.pause();
       }
     },
     mounted: function mounted() {
@@ -784,7 +790,9 @@
       attrs: {
         "show": !_vm.isFocusedOrDisabled
       }
-    }, [_vm._v("\n      Double click to preview\n    ")]), _vm._v(" "), _c('api-video-player', _vm._b({}, 'api-video-player', _vm.element.data, false))], 1)], 1);
+    }, [_vm._v("\n      Double click to preview\n    ")]), _vm._v(" "), _c('api-video-player', _vm._b({
+      ref: "player"
+    }, 'api-video-player', _vm.element.data, false))], 1)], 1);
   };
 
   var __vue_staticRenderFns__$6 = [];
@@ -793,7 +801,7 @@
   var __vue_inject_styles__$6 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$6 = "data-v-421fe3ef";
+  var __vue_scope_id__$6 = "data-v-c83029a2";
   /* module identifier */
 
   var __vue_module_identifier__$6 = undefined;

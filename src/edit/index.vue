@@ -21,7 +21,7 @@
       <preview-overlay v-else :show="!isFocusedOrDisabled">
         Double click to preview
       </preview-overlay>
-      <api-video-player v-bind="element.data" />
+      <api-video-player ref="player" v-bind="element.data" />
     </div>
   </div>
 </template>
@@ -96,7 +96,7 @@ export default {
       if (this.isReadyToUpload) this.upload();
     },
     isFocusedOrDisabled(value) {
-      if (!value) this.$emit('save', this.element.data);
+      if (!value) this.$refs.player.pause();
     }
   },
   mounted() {

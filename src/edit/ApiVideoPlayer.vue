@@ -3,23 +3,31 @@
 </template>
 
 <script>
+import { PlayerSdk } from '@api.video/player-sdk';
+
 export default {
   name: 'api-video-player',
   props: {
+    videoId: { type: String, default: null },
     embedCode: { type: String, default: null }
   },
   methods: {
-    setVideo() {
+    setEmbeddedPlayer() {
+      if (!this.embedCode) return;
       const { player } = this.$refs;
-      if (!player) return;
       player.innerHTML = this.embedCode;
+      player.firstChild.id = this.videoId;
+      this.player = new PlayerSdk(`#${this.videoId}`);
+    },
+    pause() {
+      this.player.pause();
     }
   },
   watch: {
-    embedCode: 'setVideo'
+    embedCode: 'setEmbeddedPlayer'
   },
   mounted() {
-    this.setVideo();
+    this.setEmbeddedPlayer();
   }
 };
 </script>

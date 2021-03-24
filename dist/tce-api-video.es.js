@@ -1,3 +1,4 @@
+import { PlayerSdk } from '@api.video/player-sdk';
 import axios from 'axios';
 import get from 'lodash/get';
 
@@ -23,29 +24,35 @@ var shared = {
 };
 
 //
-//
-//
-//
 var script = {
   name: 'api-video-player',
   props: {
+    videoId: {
+      type: String,
+      "default": null
+    },
     embedCode: {
       type: String,
       "default": null
     }
   },
   methods: {
-    setVideo: function setVideo() {
+    setEmbeddedPlayer: function setEmbeddedPlayer() {
+      if (!this.embedCode) return;
       var player = this.$refs.player;
-      if (!player) return;
       player.innerHTML = this.embedCode;
+      player.firstChild.id = this.videoId;
+      this.player = new PlayerSdk("#".concat(this.videoId));
+    },
+    pause: function pause() {
+      this.player.pause();
     }
   },
   watch: {
-    embedCode: 'setVideo'
+    embedCode: 'setEmbeddedPlayer'
   },
   mounted: function mounted() {
-    this.setVideo();
+    this.setEmbeddedPlayer();
   }
 };
 
@@ -157,7 +164,7 @@ var __vue_staticRenderFns__ = [];
 var __vue_inject_styles__ = undefined;
 /* scoped */
 
-var __vue_scope_id__ = "data-v-2223be9c";
+var __vue_scope_id__ = "data-v-2a45b45d";
 /* module identifier */
 
 var __vue_module_identifier__ = undefined;
@@ -698,7 +705,7 @@ var script$6 = {
       if (this.isReadyToUpload) this.upload();
     },
     isFocusedOrDisabled: function isFocusedOrDisabled(value) {
-      if (!value) this.$emit('save', this.element.data);
+      if (!value) this.$refs.player.pause();
     }
   },
   mounted: function mounted() {
@@ -776,7 +783,9 @@ var __vue_render__$6 = function __vue_render__() {
     attrs: {
       "show": !_vm.isFocusedOrDisabled
     }
-  }, [_vm._v("\n      Double click to preview\n    ")]), _vm._v(" "), _c('api-video-player', _vm._b({}, 'api-video-player', _vm.element.data, false))], 1)], 1);
+  }, [_vm._v("\n      Double click to preview\n    ")]), _vm._v(" "), _c('api-video-player', _vm._b({
+    ref: "player"
+  }, 'api-video-player', _vm.element.data, false))], 1)], 1);
 };
 
 var __vue_staticRenderFns__$6 = [];
@@ -785,7 +794,7 @@ var __vue_staticRenderFns__$6 = [];
 var __vue_inject_styles__$6 = undefined;
 /* scoped */
 
-var __vue_scope_id__$6 = "data-v-421fe3ef";
+var __vue_scope_id__$6 = "data-v-c83029a2";
 /* module identifier */
 
 var __vue_module_identifier__$6 = undefined;
