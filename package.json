@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@api.video/nodejs-sdk": "^1.10.1",
+    "@api.video/player-sdk": "^1.2.5",
     "axios": "^0.21.1",
     "lodash": "^4.17.20"
   },
