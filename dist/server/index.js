@@ -54,7 +54,7 @@ async function startPollingPlayableStatus(asset, client, context) {
   if (!isPlayable) {
     return setTimeout(() => startPollingPlayableStatus(asset, client, context), 5000);
   }
-  asset.update({ data: { ...asset.data, playable: true } }, context);
+  asset.update({ data: { ...asset.data, playable: true } }, { context });
 }
 
 function afterLoaded(asset, { config: { tce } }) {
