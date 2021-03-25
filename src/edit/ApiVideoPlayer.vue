@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import { PlayerSdk } from '@api.video/player-sdk';
 
 const playerMethods = Object
@@ -14,17 +15,33 @@ const playerMethods = Object
     }
   }), {});
 
+const playerOptions = {
+  live: { type: Boolean, default: false },
+  autoplay: { type: Boolean, default: false },
+  muted: { type: Boolean, default: false },
+  metadata: { type: Object, default: null },
+  hideControls: { type: Boolean, default: false },
+  hideTitle: { type: Boolean, default: false },
+  loop: { type: Boolean, default: false }
+};
+
 export default {
   name: 'api-video-player',
+  inheritAttrs: false,
   props: {
+    ...playerOptions,
     videoId: { type: String, required: true },
     token: { type: String, required: true }
   },
   data: () => ({ player: null }),
+  computed: {
+    playerOptions: vm => pick(vm, Object.keys(playerOptions))
+  },
   methods: {
     ...playerMethods,
     setEmbeddedPlayer() {
       this.player = new PlayerSdk(`#${this.videoId}`, {
+        ...this.playerOptions,
         id: this.videoId,
         token: this.token
       });

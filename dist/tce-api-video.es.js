@@ -1,3 +1,4 @@
+import pick from 'lodash/pick';
 import { PlayerSdk } from '@api.video/player-sdk';
 import axios from 'axios';
 import get from 'lodash/get';
@@ -101,9 +102,40 @@ var playerMethods = Object.keys(PlayerSdk.prototype).reduce(function (all, metho
     (_this$player = this.player)[method].apply(_this$player, arguments);
   }));
 }, {});
+var _playerOptions = {
+  live: {
+    type: Boolean,
+    "default": false
+  },
+  autoplay: {
+    type: Boolean,
+    "default": false
+  },
+  muted: {
+    type: Boolean,
+    "default": false
+  },
+  metadata: {
+    type: Object,
+    "default": null
+  },
+  hideControls: {
+    type: Boolean,
+    "default": false
+  },
+  hideTitle: {
+    type: Boolean,
+    "default": false
+  },
+  loop: {
+    type: Boolean,
+    "default": false
+  }
+};
 var script = {
   name: 'api-video-player',
-  props: {
+  inheritAttrs: false,
+  props: Object.assign({}, _playerOptions, {
     videoId: {
       type: String,
       required: true
@@ -112,18 +144,23 @@ var script = {
       type: String,
       required: true
     }
-  },
+  }),
   data: function data() {
     return {
       player: null
     };
   },
+  computed: {
+    playerOptions: function playerOptions(vm) {
+      return pick(vm, Object.keys(_playerOptions));
+    }
+  },
   methods: Object.assign({}, playerMethods, {
     setEmbeddedPlayer: function setEmbeddedPlayer() {
-      this.player = new PlayerSdk("#".concat(this.videoId), {
+      this.player = new PlayerSdk("#".concat(this.videoId), Object.assign({}, this.playerOptions, {
         id: this.videoId,
         token: this.token
-      });
+      }));
       this.addEventListeners();
     },
     addEventListener: function addEventListener(event) {

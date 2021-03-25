@@ -1,11 +1,12 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@api.video/player-sdk'), require('axios'), require('lodash/get')) :
-  typeof define === 'function' && define.amd ? define(['exports', '@api.video/player-sdk', 'axios', 'lodash/get'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['tce-api-video'] = {}), global.playerSdk, global.axios, global.get));
-}(this, (function (exports, playerSdk, axios, get) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash/pick'), require('@api.video/player-sdk'), require('axios'), require('lodash/get')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'lodash/pick', '@api.video/player-sdk', 'axios', 'lodash/get'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['tce-api-video'] = {}), global.pick, global.playerSdk, global.axios, global.get));
+}(this, (function (exports, pick, playerSdk, axios, get) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
+  var pick__default = /*#__PURE__*/_interopDefaultLegacy(pick);
   var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
   var get__default = /*#__PURE__*/_interopDefaultLegacy(get);
 
@@ -108,9 +109,40 @@
       (_this$player = this.player)[method].apply(_this$player, arguments);
     }));
   }, {});
+  var _playerOptions = {
+    live: {
+      type: Boolean,
+      "default": false
+    },
+    autoplay: {
+      type: Boolean,
+      "default": false
+    },
+    muted: {
+      type: Boolean,
+      "default": false
+    },
+    metadata: {
+      type: Object,
+      "default": null
+    },
+    hideControls: {
+      type: Boolean,
+      "default": false
+    },
+    hideTitle: {
+      type: Boolean,
+      "default": false
+    },
+    loop: {
+      type: Boolean,
+      "default": false
+    }
+  };
   var script = {
     name: 'api-video-player',
-    props: {
+    inheritAttrs: false,
+    props: Object.assign({}, _playerOptions, {
       videoId: {
         type: String,
         required: true
@@ -119,18 +151,23 @@
         type: String,
         required: true
       }
-    },
+    }),
     data: function data() {
       return {
         player: null
       };
     },
+    computed: {
+      playerOptions: function playerOptions(vm) {
+        return pick__default['default'](vm, Object.keys(_playerOptions));
+      }
+    },
     methods: Object.assign({}, playerMethods, {
       setEmbeddedPlayer: function setEmbeddedPlayer() {
-        this.player = new playerSdk.PlayerSdk("#".concat(this.videoId), {
+        this.player = new playerSdk.PlayerSdk("#".concat(this.videoId), Object.assign({}, this.playerOptions, {
           id: this.videoId,
           token: this.token
-        });
+        }));
         this.addEventListeners();
       },
       addEventListener: function addEventListener(event) {

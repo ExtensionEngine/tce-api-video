@@ -2,12 +2,14 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
+var pick = require('lodash/pick');
 var playerSdk = require('@api.video/player-sdk');
 var axios = require('axios');
 var get = require('lodash/get');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
+var pick__default = /*#__PURE__*/_interopDefaultLegacy(pick);
 var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
 var get__default = /*#__PURE__*/_interopDefaultLegacy(get);
 
@@ -110,9 +112,40 @@ var playerMethods = Object.keys(playerSdk.PlayerSdk.prototype).reduce(function (
     (_this$player = this.player)[method].apply(_this$player, arguments);
   }));
 }, {});
+var _playerOptions = {
+  live: {
+    type: Boolean,
+    "default": false
+  },
+  autoplay: {
+    type: Boolean,
+    "default": false
+  },
+  muted: {
+    type: Boolean,
+    "default": false
+  },
+  metadata: {
+    type: Object,
+    "default": null
+  },
+  hideControls: {
+    type: Boolean,
+    "default": false
+  },
+  hideTitle: {
+    type: Boolean,
+    "default": false
+  },
+  loop: {
+    type: Boolean,
+    "default": false
+  }
+};
 var script = {
   name: 'api-video-player',
-  props: {
+  inheritAttrs: false,
+  props: Object.assign({}, _playerOptions, {
     videoId: {
       type: String,
       required: true
@@ -121,18 +154,23 @@ var script = {
       type: String,
       required: true
     }
-  },
+  }),
   data: function data() {
     return {
       player: null
     };
   },
+  computed: {
+    playerOptions: function playerOptions(vm) {
+      return pick__default['default'](vm, Object.keys(_playerOptions));
+    }
+  },
   methods: Object.assign({}, playerMethods, {
     setEmbeddedPlayer: function setEmbeddedPlayer() {
-      this.player = new playerSdk.PlayerSdk("#".concat(this.videoId), {
+      this.player = new playerSdk.PlayerSdk("#".concat(this.videoId), Object.assign({}, this.playerOptions, {
         id: this.videoId,
         token: this.token
-      });
+      }));
       this.addEventListeners();
     },
     addEventListener: function addEventListener(event) {
