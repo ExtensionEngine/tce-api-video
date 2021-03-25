@@ -67,8 +67,11 @@ function afterLoaded(asset, { config: { tce } }) {
   const client = createClient({ apiKey, isSandBox });
   return client.videos.get(videoId)
     .then(res => {
+      const playerUrl = new URL(res.assets.player);
+      const token = playerUrl.searchParams.get('token');
       asset.data.embedCode = res.assets.iframe;
       asset.data.url = res.assets.mp4;
+      asset.data.token = token;
       return asset;
     })
     .catch(error => setAssetError(asset, error));

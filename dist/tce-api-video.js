@@ -32,34 +32,125 @@ var shared = {
   DEFAULT_ERROR_MSG: DEFAULT_ERROR_MSG
 };
 
-//
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+function _slicedToArray(arr, i) {
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
+}
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArrayLimit(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+var playerMethods = Object.keys(playerSdk.PlayerSdk.prototype).reduce(function (all, method) {
+  return Object.assign({}, all, _defineProperty({}, method, function () {
+    var _this$player;
+
+    (_this$player = this.player)[method].apply(_this$player, arguments);
+  }));
+}, {});
 var script = {
   name: 'api-video-player',
   props: {
     videoId: {
       type: String,
-      "default": null
+      required: true
     },
-    embedCode: {
+    token: {
       type: String,
-      "default": null
+      required: true
     }
   },
-  methods: {
+  data: function data() {
+    return {
+      player: null
+    };
+  },
+  methods: Object.assign({}, playerMethods, {
     setEmbeddedPlayer: function setEmbeddedPlayer() {
-      if (!this.embedCode) return;
-      var player = this.$refs.player;
-      player.innerHTML = this.embedCode;
-      player.firstChild.id = this.videoId;
-      this.player = new playerSdk.PlayerSdk("#".concat(this.videoId));
+      this.player = new playerSdk.PlayerSdk("#".concat(this.videoId), {
+        id: this.videoId,
+        token: this.token
+      });
+      this.addEventListeners();
     },
-    pause: function pause() {
-      this.player.pause();
+    addEventListener: function addEventListener(event) {
+      var _this = this;
+
+      this.player.addEventListener(event, function () {
+        for (var _len = arguments.length, params = new Array(_len), _key = 0; _key < _len; _key++) {
+          params[_key] = arguments[_key];
+        }
+
+        _this.$emit.apply(_this, [event].concat(params));
+      });
+    },
+    addEventListeners: function addEventListeners() {
+      var events = Object.keys(this.$listeners);
+      events.forEach(this.addEventListener);
     }
-  },
-  watch: {
-    embedCode: 'setEmbeddedPlayer'
-  },
+  }),
   mounted: function mounted() {
     this.setEmbeddedPlayer();
   }
@@ -162,8 +253,10 @@ var __vue_render__ = function __vue_render__() {
   var _c = _vm._self._c || _h;
 
   return _c('div', {
-    ref: "player",
-    staticClass: "player d-flex align-center justify-center"
+    staticClass: "api-video-player d-flex align-center justify-center",
+    attrs: {
+      "id": _vm.videoId
+    }
   });
 };
 
@@ -173,7 +266,7 @@ var __vue_staticRenderFns__ = [];
 var __vue_inject_styles__ = undefined;
 /* scoped */
 
-var __vue_scope_id__ = "data-v-2a45b45d";
+var __vue_scope_id__ = undefined;
 /* module identifier */
 
 var __vue_module_identifier__ = undefined;
@@ -714,7 +807,7 @@ var script$6 = {
       if (this.isReadyToUpload) this.upload();
     },
     isFocusedOrDisabled: function isFocusedOrDisabled(value) {
-      if (!value) this.$refs.player.pause();
+      if (!value && this.$refs.player) this.$refs.player.pause();
     }
   },
   mounted: function mounted() {
@@ -788,13 +881,13 @@ var __vue_render__$6 = function __vue_render__() {
     attrs: {
       "message": _vm.infoMessage
     }
-  }) : _c('preview-overlay', {
+  }) : [_c('preview-overlay', {
     attrs: {
       "show": !_vm.isFocusedOrDisabled
     }
-  }, [_vm._v("\n      Double click to preview\n    ")]), _vm._v(" "), _c('api-video-player', _vm._b({
+  }, [_vm._v("\n        Double click to preview\n      ")]), _vm._v(" "), _c('api-video-player', _vm._b({
     ref: "player"
-  }, 'api-video-player', _vm.element.data, false))], 1)], 1);
+  }, 'api-video-player', _vm.element.data, false))]], 2)], 1);
 };
 
 var __vue_staticRenderFns__$6 = [];
@@ -803,7 +896,7 @@ var __vue_staticRenderFns__$6 = [];
 var __vue_inject_styles__$6 = undefined;
 /* scoped */
 
-var __vue_scope_id__$6 = "data-v-c83029a2";
+var __vue_scope_id__$6 = "data-v-27862e4a";
 /* module identifier */
 
 var __vue_module_identifier__$6 = undefined;
@@ -824,62 +917,6 @@ var info = {
   type: 'API_VIDEO',
   version: '1.0'
 };
-
-function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
-}
-
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-function _iterableToArrayLimit(arr, i) {
-  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
-  var _arr = [];
-  var _n = true;
-  var _d = false;
-  var _e = undefined;
-
-  try {
-    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-      _arr.push(_s.value);
-
-      if (i && _arr.length === i) break;
-    }
-  } catch (err) {
-    _d = true;
-    _e = err;
-  } finally {
-    try {
-      if (!_n && _i["return"] != null) _i["return"]();
-    } finally {
-      if (_d) throw _e;
-    }
-  }
-
-  return _arr;
-}
-
-function _unsupportedIterableToArray(o, minLen) {
-  if (!o) return;
-  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
-  var n = Object.prototype.toString.call(o).slice(8, -1);
-  if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(o);
-  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
-}
-
-function _arrayLikeToArray(arr, len) {
-  if (len == null || len > arr.length) len = arr.length;
-
-  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
-
-  return arr2;
-}
-
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
 
 //
 //
