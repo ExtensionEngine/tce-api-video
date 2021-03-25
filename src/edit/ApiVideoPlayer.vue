@@ -5,6 +5,15 @@
 <script>
 import { PlayerSdk } from '@api.video/player-sdk';
 
+const playerMethods = Object
+  .keys(PlayerSdk.prototype)
+  .reduce((all, method) => ({
+    ...all,
+    [method]: function (...params) {
+      this.player[method](...params);
+    }
+  }), {});
+
 export default {
   name: 'api-video-player',
   props: {
@@ -13,14 +22,22 @@ export default {
   },
   data: () => ({ player: null }),
   methods: {
+    ...playerMethods,
     setEmbeddedPlayer() {
       this.player = new PlayerSdk(`#${this.videoId}`, {
         id: this.videoId,
         token: this.token
       });
+      this.addEventListeners();
     },
-    pause() {
-      this.player.pause();
+    addEventListener(event) {
+      this.player.addEventListener(event, (...params) => {
+        this.$emit(event, ...params);
+      });
+    },
+    addEventListeners() {
+      const events = Object.keys(this.$listeners);
+      events.forEach(this.addEventListener);
     }
   },
   mounted() {
