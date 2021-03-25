@@ -4,6 +4,7 @@ const { createClient, getUploadUrl } = require('./apiVideo');
 const { DEFAULT_ERROR_MSG, ELEMENT_STATE } = require('../shared');
 const get = require('lodash/get');
 const unset = require('lodash/unset');
+const yn = require('yn');
 
 function beforeSave(asset, { config: { tce } }) {
   const { videoId, fileName, error } = asset.data;
@@ -13,7 +14,7 @@ function beforeSave(asset, { config: { tce } }) {
     return asset;
   }
   const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
-  const isSandBox = apiVideoIsSandbox === 'true';
+  const isSandBox = yn(apiVideoIsSandbox);
   const client = createClient({ apiKey, isSandBox });
   return client.videos.create(fileName, { public: false })
     .then(({ videoId }) => {
@@ -35,7 +36,7 @@ async function afterSave(asset, { config: { tce } }, options = {}) {
   const isAvailableOrError = error || !videoId || playable;
   if (isAvailableOrError) return asset;
   const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
-  const isSandBox = apiVideoIsSandbox === 'true';
+  const isSandBox = yn(apiVideoIsSandbox);
   const client = createClient({ apiKey, isSandBox });
   if (status === ELEMENT_STATE.UPLOADED) {
     startPollingPlayableStatus(asset, client, options.context);
@@ -62,7 +63,7 @@ function afterLoaded(asset, { config: { tce } }) {
   const isUnavailableOrError = error || !videoId || !playable;
   if (isUnavailableOrError) return asset;
   const { apiVideoApiKey: apiKey, apiVideoIsSandbox } = tce;
-  const isSandBox = apiVideoIsSandbox === 'true';
+  const isSandBox = yn(apiVideoIsSandbox);
   const client = createClient({ apiKey, isSandBox });
   return client.videos.get(videoId)
     .then(res => {
