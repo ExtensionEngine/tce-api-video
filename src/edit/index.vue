@@ -18,10 +18,12 @@
     <div v-else class="player-container">
       <error-message v-if="errorMessage" :message="errorMessage" />
       <progress-message v-else-if="infoMessage" :message="infoMessage" />
-      <preview-overlay v-else :show="!isFocusedOrDisabled">
-        Double click to preview
-      </preview-overlay>
-      <api-video-player ref="player" v-bind="element.data" />
+      <template v-else>
+        <preview-overlay :show="!isFocusedOrDisabled">
+          Double click to preview
+        </preview-overlay>
+        <api-video-player ref="player" v-bind="element.data" />
+      </template>
     </div>
   </div>
 </template>
@@ -96,7 +98,7 @@ export default {
       if (this.isReadyToUpload) this.upload();
     },
     isFocusedOrDisabled(value) {
-      if (!value) this.$refs.player.pause();
+      if (!value && this.$refs.player) this.$refs.player.pause();
     }
   },
   mounted() {
@@ -129,5 +131,10 @@ export default {
 <style lang="scss" scoped>
 .player-container {
   position: relative;
+  height: 22.5rem;
+
+  .api-video-player {
+    height: 100%;
+  }
 }
 </style>
