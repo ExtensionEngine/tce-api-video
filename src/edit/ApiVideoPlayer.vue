@@ -47,14 +47,14 @@ export default {
       });
       this.addEventListeners();
     },
+    addEventListeners() {
+      const events = Object.keys(this.$listeners);
+      events.forEach(this.addEventListener);
+    },
     addEventListener(event) {
       this.player.addEventListener(event, (...params) => {
         this.$emit(event, ...params);
       });
-    },
-    addEventListeners() {
-      const events = Object.keys(this.$listeners);
-      events.forEach(this.addEventListener);
     }
   },
   mounted() {

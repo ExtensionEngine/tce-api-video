@@ -163,6 +163,10 @@ var script = {
       }));
       this.addEventListeners();
     },
+    addEventListeners: function addEventListeners() {
+      var events = Object.keys(this.$listeners);
+      events.forEach(this.addEventListener);
+    },
     addEventListener: function addEventListener(event) {
       var _this = this;
 
@@ -173,10 +177,6 @@ var script = {
 
         _this.$emit.apply(_this, [event].concat(params));
       });
-    },
-    addEventListeners: function addEventListeners() {
-      var events = Object.keys(this.$listeners);
-      events.forEach(this.addEventListener);
     }
   }),
   mounted: function mounted() {
