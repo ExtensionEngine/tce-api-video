@@ -102,12 +102,16 @@
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
-  var playerMethods = Object.keys(playerSdk.PlayerSdk.prototype).reduce(function (all, method) {
-    return Object.assign({}, all, _defineProperty({}, method, function () {
+  var invokeMethod = function invokeMethod(method) {
+    return function () {
       var _this$player;
 
-      (_this$player = this.player)[method].apply(_this$player, arguments);
-    }));
+      return (_this$player = this.player)[method].apply(_this$player, arguments);
+    };
+  };
+
+  var playerMethods = Object.keys(playerSdk.PlayerSdk.prototype).reduce(function (all, method) {
+    return Object.assign({}, all, _defineProperty({}, method, invokeMethod(method)));
   }, {});
   var _playerOptions = {
     live: {

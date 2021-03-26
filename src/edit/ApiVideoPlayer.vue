@@ -6,14 +6,11 @@
 import pick from 'lodash/pick';
 import { PlayerSdk } from '@api.video/player-sdk';
 
-const playerMethods = Object
-  .keys(PlayerSdk.prototype)
-  .reduce((all, method) => ({
-    ...all,
-    [method]: function (...params) {
-      this.player[method](...params);
-    }
-  }), {});
+const invokeMethod = method => function (...params) {
+  return this.player[method](...params);
+};
+const playerMethods = Object.keys(PlayerSdk.prototype)
+  .reduce((all, method) => ({ ...all, [method]: invokeMethod(method) }), {});
 
 const playerOptions = {
   live: { type: Boolean, default: false },
