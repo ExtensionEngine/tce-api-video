@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash/pick'), require('@api.video/player-sdk'), require('axios'), require('lodash/get')) :
   typeof define === 'function' && define.amd ? define(['exports', 'lodash/pick', '@api.video/player-sdk', 'axios', 'lodash/get'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['tce-api-video'] = {}), global.pick, global.playerSdk, global.axios, global.get));
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.__TAILOR_CONTENT_ELEMENTS__ = global.__TAILOR_CONTENT_ELEMENTS__ || {}, global.__TAILOR_CONTENT_ELEMENTS__['@extensionengine/tce-api-video'] = {}), global.pick, global.playerSdk, global.axios, global.get));
 }(this, (function (exports, pick, playerSdk, axios, get) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
@@ -10,7 +10,7 @@
   var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
   var get__default = /*#__PURE__*/_interopDefaultLegacy(get);
 
-  var name = "tce-api-video";
+  var name = "@extensionengine/tce-api-video";
   var version = "0.0.1";
   var tailor = {
   	label: "Api video",
@@ -46,15 +46,15 @@
     return obj;
   }
 
-  function _slicedToArray(arr, i) {
-    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
+  function _slicedToArray$1(arr, i) {
+    return _arrayWithHoles$1(arr) || _iterableToArrayLimit$1(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest$1();
   }
 
-  function _arrayWithHoles(arr) {
+  function _arrayWithHoles$1(arr) {
     if (Array.isArray(arr)) return arr;
   }
 
-  function _iterableToArrayLimit(arr, i) {
+  function _iterableToArrayLimit$1(arr, i) {
     if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
     var _arr = [];
     var _n = true;
@@ -98,7 +98,7 @@
     return arr2;
   }
 
-  function _nonIterableRest() {
+  function _nonIterableRest$1() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
@@ -143,7 +143,7 @@
       "default": false
     }
   };
-  var script = {
+  var script$8 = {
     name: 'api-video-player',
     inheritAttrs: false,
     props: Object.assign({}, _playerOptions, {
@@ -281,10 +281,10 @@
   var normalizeComponent_1 = normalizeComponent;
 
   /* script */
-  var __vue_script__ = script;
+  var __vue_script__$8 = script$8;
   /* template */
 
-  var __vue_render__ = function __vue_render__() {
+  var __vue_render__$8 = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -299,27 +299,27 @@
     });
   };
 
-  var __vue_staticRenderFns__ = [];
+  var __vue_staticRenderFns__$8 = [];
   /* style */
 
-  var __vue_inject_styles__ = undefined;
+  var __vue_inject_styles__$8 = undefined;
   /* scoped */
 
-  var __vue_scope_id__ = undefined;
+  var __vue_scope_id__$8 = undefined;
   /* module identifier */
 
-  var __vue_module_identifier__ = undefined;
+  var __vue_module_identifier__$8 = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__ = false;
+  var __vue_is_functional_template__$8 = false;
   /* style inject */
 
   /* style inject SSR */
 
   var ApiVideoPlayer = normalizeComponent_1({
-    render: __vue_render__,
-    staticRenderFns: __vue_staticRenderFns__
-  }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, undefined, undefined);
+    render: __vue_render__$8,
+    staticRenderFns: __vue_staticRenderFns__$8
+  }, __vue_inject_styles__$8, __vue_script__$8, __vue_scope_id__$8, __vue_is_functional_template__$8, __vue_module_identifier__$8, undefined, undefined);
 
   var CHUNK_SIZE = 64 * 1024 * 1024; // 64MB
 
@@ -419,7 +419,7 @@
   //
   //
   //
-  var script$1 = {
+  var script$7 = {
     name: 'element-placeholder',
     props: {
       name: {
@@ -468,10 +468,10 @@
   };
 
   /* script */
-  var __vue_script__$1 = script$1;
+  var __vue_script__$7 = script$7;
   /* template */
 
-  var __vue_render__$1 = function __vue_render__() {
+  var __vue_render__$7 = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -504,27 +504,27 @@
     }, [_vm._v("\n        " + _vm._s(_vm.activeIcon) + "\n      ")]) : _vm._e()]], 2) : _vm._e()], 1);
   };
 
-  var __vue_staticRenderFns__$1 = [];
+  var __vue_staticRenderFns__$7 = [];
   /* style */
 
-  var __vue_inject_styles__$1 = undefined;
+  var __vue_inject_styles__$7 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$1 = undefined;
+  var __vue_scope_id__$7 = undefined;
   /* module identifier */
 
-  var __vue_module_identifier__$1 = undefined;
+  var __vue_module_identifier__$7 = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__$1 = false;
+  var __vue_is_functional_template__$7 = false;
   /* style inject */
 
   /* style inject SSR */
 
   var ElementPlaceholder = normalizeComponent_1({
-    render: __vue_render__$1,
-    staticRenderFns: __vue_staticRenderFns__$1
-  }, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, undefined, undefined);
+    render: __vue_render__$7,
+    staticRenderFns: __vue_staticRenderFns__$7
+  }, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, undefined, undefined);
 
   //
   //
@@ -532,15 +532,15 @@
   //
   //
   //
-  var script$2 = {
+  var script$6 = {
     name: 'tce-overlay'
   };
 
   /* script */
-  var __vue_script__$2 = script$2;
+  var __vue_script__$6 = script$6;
   /* template */
 
-  var __vue_render__$2 = function __vue_render__() {
+  var __vue_render__$6 = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -552,30 +552,30 @@
     }, [_vm._t("default")], 2);
   };
 
-  var __vue_staticRenderFns__$2 = [];
+  var __vue_staticRenderFns__$6 = [];
   /* style */
 
-  var __vue_inject_styles__$2 = undefined;
+  var __vue_inject_styles__$6 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$2 = "data-v-28420ade";
+  var __vue_scope_id__$6 = "data-v-28420ade";
   /* module identifier */
 
-  var __vue_module_identifier__$2 = undefined;
+  var __vue_module_identifier__$6 = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__$2 = false;
+  var __vue_is_functional_template__$6 = false;
   /* style inject */
 
   /* style inject SSR */
 
   var TceOverlay = normalizeComponent_1({
-    render: __vue_render__$2,
-    staticRenderFns: __vue_staticRenderFns__$2
-  }, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, undefined, undefined);
+    render: __vue_render__$6,
+    staticRenderFns: __vue_staticRenderFns__$6
+  }, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, undefined, undefined);
 
   //
-  var script$3 = {
+  var script$5 = {
     name: 'error-message',
     props: {
       message: {
@@ -589,10 +589,10 @@
   };
 
   /* script */
-  var __vue_script__$3 = script$3;
+  var __vue_script__$5 = script$5;
   /* template */
 
-  var __vue_render__$3 = function __vue_render__() {
+  var __vue_render__$5 = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -608,27 +608,27 @@
     }, [_vm._v("mdi-alert")]), _vm._v("\n    " + _vm._s(_vm.message) + "\n  ")], 1)]);
   };
 
-  var __vue_staticRenderFns__$3 = [];
+  var __vue_staticRenderFns__$5 = [];
   /* style */
 
-  var __vue_inject_styles__$3 = undefined;
+  var __vue_inject_styles__$5 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$3 = "data-v-576a2d2e";
+  var __vue_scope_id__$5 = "data-v-576a2d2e";
   /* module identifier */
 
-  var __vue_module_identifier__$3 = undefined;
+  var __vue_module_identifier__$5 = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__$3 = false;
+  var __vue_is_functional_template__$5 = false;
   /* style inject */
 
   /* style inject SSR */
 
   var ErrorMessage = normalizeComponent_1({
-    render: __vue_render__$3,
-    staticRenderFns: __vue_staticRenderFns__$3
-  }, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, undefined, undefined);
+    render: __vue_render__$5,
+    staticRenderFns: __vue_staticRenderFns__$5
+  }, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, undefined, undefined);
 
   //
   //
@@ -696,7 +696,7 @@
   }, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, undefined, undefined);
 
   //
-  var script$5 = {
+  var script$3 = {
     name: 'progress-message',
     props: {
       message: {
@@ -710,10 +710,10 @@
   };
 
   /* script */
-  var __vue_script__$5 = script$5;
+  var __vue_script__$3 = script$3;
   /* template */
 
-  var __vue_render__$5 = function __vue_render__() {
+  var __vue_render__$3 = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -731,33 +731,33 @@
     }), _vm._v("\n    " + _vm._s(_vm.message) + "\n  ")], 1)]);
   };
 
-  var __vue_staticRenderFns__$5 = [];
+  var __vue_staticRenderFns__$3 = [];
   /* style */
 
-  var __vue_inject_styles__$5 = undefined;
+  var __vue_inject_styles__$3 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$5 = "data-v-2cf5ce5b";
+  var __vue_scope_id__$3 = "data-v-2cf5ce5b";
   /* module identifier */
 
-  var __vue_module_identifier__$5 = undefined;
+  var __vue_module_identifier__$3 = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__$5 = false;
+  var __vue_is_functional_template__$3 = false;
   /* style inject */
 
   /* style inject SSR */
 
   var ProgressMessage = normalizeComponent_1({
-    render: __vue_render__$5,
-    staticRenderFns: __vue_staticRenderFns__$5
-  }, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, undefined, undefined);
+    render: __vue_render__$3,
+    staticRenderFns: __vue_staticRenderFns__$3
+  }, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, undefined, undefined);
 
   //
   var UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
   var UPLOADING_MSG = 'Video is uploading. Please do not leave the page.';
   var PROCESSING_MSG = 'Video is processing...';
-  var script$6 = {
+  var script$2 = {
     name: 'tce-api-video',
     inject: ['$elementBus'],
     props: {
@@ -876,10 +876,10 @@
   };
 
   /* script */
-  var __vue_script__$6 = script$6;
+  var __vue_script__$2 = script$2;
   /* template */
 
-  var __vue_render__$6 = function __vue_render__() {
+  var __vue_render__$2 = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -929,27 +929,27 @@
     }, 'api-video-player', _vm.element.data, false))]], 2)], 1);
   };
 
-  var __vue_staticRenderFns__$6 = [];
+  var __vue_staticRenderFns__$2 = [];
   /* style */
 
-  var __vue_inject_styles__$6 = undefined;
+  var __vue_inject_styles__$2 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$6 = "data-v-27862e4a";
+  var __vue_scope_id__$2 = "data-v-27862e4a";
   /* module identifier */
 
-  var __vue_module_identifier__$6 = undefined;
+  var __vue_module_identifier__$2 = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__$6 = false;
+  var __vue_is_functional_template__$2 = false;
   /* style inject */
 
   /* style inject SSR */
 
   var Edit = normalizeComponent_1({
-    render: __vue_render__$6,
-    staticRenderFns: __vue_staticRenderFns__$6
-  }, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, undefined, undefined);
+    render: __vue_render__$2,
+    staticRenderFns: __vue_staticRenderFns__$2
+  }, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, undefined, undefined);
 
   var info = {
     name: 'Api Video',
@@ -977,7 +977,7 @@
   //
   //
   //
-  var script$7 = {
+  var script$1 = {
     name: 'video-upload-btn',
     inheritAttrs: false,
     props: {
@@ -993,10 +993,10 @@
   };
 
   /* script */
-  var __vue_script__$7 = script$7;
+  var __vue_script__$1 = script$1;
   /* template */
 
-  var __vue_render__$7 = function __vue_render__() {
+  var __vue_render__$1 = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -1034,31 +1034,31 @@
     })], 2);
   };
 
-  var __vue_staticRenderFns__$7 = [];
+  var __vue_staticRenderFns__$1 = [];
   /* style */
 
-  var __vue_inject_styles__$7 = undefined;
+  var __vue_inject_styles__$1 = undefined;
   /* scoped */
 
-  var __vue_scope_id__$7 = "data-v-54b9862e";
+  var __vue_scope_id__$1 = "data-v-54b9862e";
   /* module identifier */
 
-  var __vue_module_identifier__$7 = undefined;
+  var __vue_module_identifier__$1 = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__$7 = false;
+  var __vue_is_functional_template__$1 = false;
   /* style inject */
 
   /* style inject SSR */
 
   var UploadBtn = normalizeComponent_1({
-    render: __vue_render__$7,
-    staticRenderFns: __vue_staticRenderFns__$7
-  }, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, undefined, undefined);
+    render: __vue_render__$1,
+    staticRenderFns: __vue_staticRenderFns__$1
+  }, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, undefined, undefined);
 
   var MP4_MIME_TYPE = 'video/mp4';
   var FORMAT_ERROR = 'MP4 format is required.';
-  var script$8 = {
+  var script = {
     name: 'tce-api-video-toolbar',
     inject: ['$elementBus'],
     props: {
@@ -1077,7 +1077,7 @@
     },
     methods: {
       upload: function upload(e) {
-        var _e$target$files = _slicedToArray(e.target.files, 1),
+        var _e$target$files = _slicedToArray$1(e.target.files, 1),
             file = _e$target$files[0];
 
         if (file.type !== MP4_MIME_TYPE) {
@@ -1096,10 +1096,10 @@
   };
 
   /* script */
-  var __vue_script__$8 = script$8;
+  var __vue_script__ = script;
   /* template */
 
-  var __vue_render__$8 = function __vue_render__() {
+  var __vue_render__ = function __vue_render__() {
     var _vm = this;
 
     var _h = _vm.$createElement;
@@ -1134,29 +1134,29 @@
     })], 1)], 1);
   };
 
-  var __vue_staticRenderFns__$8 = [];
+  var __vue_staticRenderFns__ = [];
   /* style */
 
-  var __vue_inject_styles__$8 = undefined;
+  var __vue_inject_styles__ = undefined;
   /* scoped */
 
-  var __vue_scope_id__$8 = "data-v-e7641378";
+  var __vue_scope_id__ = "data-v-e7641378";
   /* module identifier */
 
-  var __vue_module_identifier__$8 = undefined;
+  var __vue_module_identifier__ = undefined;
   /* functional template */
 
-  var __vue_is_functional_template__$8 = false;
+  var __vue_is_functional_template__ = false;
   /* style inject */
 
   /* style inject SSR */
 
   var Toolbar = normalizeComponent_1({
-    render: __vue_render__$8,
-    staticRenderFns: __vue_staticRenderFns__$8
-  }, __vue_inject_styles__$8, __vue_script__$8, __vue_scope_id__$8, __vue_is_functional_template__$8, __vue_module_identifier__$8, undefined, undefined);
+    render: __vue_render__,
+    staticRenderFns: __vue_staticRenderFns__
+  }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, undefined, undefined);
 
-  var initState = function initState() {
+  var initState$1 = function initState() {
     return {
       fileName: null,
       videoId: null,
@@ -1175,7 +1175,7 @@
    */
 
   var plugin__default = Object.assign({}, info, {
-    initState: initState,
+    initState: initState$1,
     components: {
       Edit: Edit,
       Toolbar: Toolbar
@@ -1193,15 +1193,15 @@
     'default': plugin__default
   });
 
-  function _slicedToArray$1(arr, i) {
-    return _arrayWithHoles$1(arr) || _iterableToArrayLimit$1(arr, i) || _nonIterableRest$1();
+  function _slicedToArray(arr, i) {
+    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
   }
 
-  function _arrayWithHoles$1(arr) {
+  function _arrayWithHoles(arr) {
     if (Array.isArray(arr)) return arr;
   }
 
-  function _iterableToArrayLimit$1(arr, i) {
+  function _iterableToArrayLimit(arr, i) {
     if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
       return;
     }
@@ -1231,7 +1231,7 @@
     return _arr;
   }
 
-  function _nonIterableRest$1() {
+  function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance");
   }
 
@@ -1350,14 +1350,14 @@
     return typeof arg === 'function';
   };
   var _pluginOptions$initSt = plugin__default.initState,
-      initState$1 = _pluginOptions$initSt === void 0 ? function () {
+      initState = _pluginOptions$initSt === void 0 ? function () {
     return {};
   } : _pluginOptions$initSt,
       _pluginOptions$compon = plugin__default.components,
       components = _pluginOptions$compon === void 0 ? {} : _pluginOptions$compon;
   var options = Object.assign({
     version: version,
-    initState: initState$1,
+    initState: initState,
     components: components
   }, tailor);
   var install = function install(Vue) {
@@ -1366,7 +1366,7 @@
     }
 
     Object.entries(components).forEach(function (_ref) {
-      var _ref2 = _slicedToArray$1(_ref, 2),
+      var _ref2 = _slicedToArray(_ref, 2),
           name$1 = _ref2[0],
           component = _ref2[1];
 
