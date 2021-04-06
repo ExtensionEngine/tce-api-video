@@ -1,92 +1,1092 @@
-'use strict';
+import pick from 'lodash/pick';
+import { PlayerSdk } from '@api.video/player-sdk';
+import axios from 'axios';
+import get from 'lodash/get';
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var name = "tce-apivideo";
+var name = "@extensionengine/tce-api-video";
 var version = "0.0.1";
-
-//
-//
-//
-//
-var script = {
-  name: 'tce-api-video'
+var tailor = {
+	label: "Api video",
+	type: "API_VIDEO",
+	ui: {
+		icon: "mdi-video",
+		forceFullWidth: false
+	}
 };
 
-function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
-    if (typeof shadowMode !== 'boolean') {
-        createInjectorSSR = createInjector;
-        createInjector = shadowMode;
-        shadowMode = false;
-    }
-    // Vue.extend constructor export interop.
-    const options = typeof script === 'function' ? script.options : script;
-    // render functions
-    if (template && template.render) {
-        options.render = template.render;
-        options.staticRenderFns = template.staticRenderFns;
-        options._compiled = true;
-        // functional template
-        if (isFunctionalTemplate) {
-            options.functional = true;
-        }
-    }
-    // scopedId
-    if (scopeId) {
-        options._scopeId = scopeId;
-    }
-    let hook;
-    if (moduleIdentifier) {
-        // server build
-        hook = function (context) {
-            // 2.3 injection
-            context =
-                context || // cached call
-                    (this.$vnode && this.$vnode.ssrContext) || // stateful
-                    (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext); // functional
-            // 2.2 with runInNewContext: true
-            if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-                context = __VUE_SSR_CONTEXT__;
-            }
-            // inject component styles
-            if (style) {
-                style.call(this, createInjectorSSR(context));
-            }
-            // register component module identifier for async chunk inference
-            if (context && context._registeredComponents) {
-                context._registeredComponents.add(moduleIdentifier);
-            }
-        };
-        // used by ssr in case component is cached and beforeCreate
-        // never gets called
-        options._ssrRegister = hook;
-    }
-    else if (style) {
-        hook = shadowMode
-            ? function (context) {
-                style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
-            }
-            : function (context) {
-                style.call(this, createInjector(context));
-            };
-    }
-    if (hook) {
-        if (options.functional) {
-            // register for functional component in vue file
-            const originalRender = options.render;
-            options.render = function renderWithStyleInjection(h, context) {
-                hook.call(context);
-                return originalRender(h, context);
-            };
-        }
-        else {
-            // inject component registration as beforeCreate hook
-            const existing = options.beforeCreate;
-            options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
-        }
-    }
-    return script;
+var ELEMENT_STATE = {
+  UPLOADING: 'UPLOADING',
+  UPLOADED: 'UPLOADED'
+};
+var DEFAULT_ERROR_MSG = 'Something went wrong.';
+var shared = {
+  ELEMENT_STATE: ELEMENT_STATE,
+  DEFAULT_ERROR_MSG: DEFAULT_ERROR_MSG
+};
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
 }
+
+function _slicedToArray$1(arr, i) {
+  return _arrayWithHoles$1(arr) || _iterableToArrayLimit$1(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest$1();
+}
+
+function _arrayWithHoles$1(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArrayLimit$1(arr, i) {
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _e = undefined;
+
+  try {
+    for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+
+  return _arr;
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _nonIterableRest$1() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+
+var invokeMethod = function invokeMethod(method) {
+  return function () {
+    var _this$player;
+
+    return (_this$player = this.player)[method].apply(_this$player, arguments);
+  };
+};
+
+var playerMethods = Object.keys(PlayerSdk.prototype).reduce(function (all, method) {
+  return Object.assign({}, all, _defineProperty({}, method, invokeMethod(method)));
+}, {});
+var _playerOptions = {
+  live: {
+    type: Boolean,
+    "default": false
+  },
+  autoplay: {
+    type: Boolean,
+    "default": false
+  },
+  muted: {
+    type: Boolean,
+    "default": false
+  },
+  metadata: {
+    type: Object,
+    "default": null
+  },
+  hideControls: {
+    type: Boolean,
+    "default": false
+  },
+  hideTitle: {
+    type: Boolean,
+    "default": false
+  },
+  loop: {
+    type: Boolean,
+    "default": false
+  }
+};
+var script$8 = {
+  name: 'api-video-player',
+  inheritAttrs: false,
+  props: Object.assign({}, _playerOptions, {
+    videoId: {
+      type: String,
+      required: true
+    },
+    token: {
+      type: String,
+      required: true
+    }
+  }),
+  data: function data() {
+    return {
+      player: null
+    };
+  },
+  computed: {
+    playerOptions: function playerOptions(vm) {
+      return pick(vm, Object.keys(_playerOptions));
+    }
+  },
+  methods: Object.assign({}, playerMethods, {
+    setEmbeddedPlayer: function setEmbeddedPlayer() {
+      this.player = new PlayerSdk("#".concat(this.videoId), Object.assign({}, this.playerOptions, {
+        id: this.videoId,
+        token: this.token
+      }));
+      this.addEventListeners();
+    },
+    addEventListeners: function addEventListeners() {
+      var events = Object.keys(this.$listeners);
+      events.forEach(this.addEventListener);
+    },
+    addEventListener: function addEventListener(event) {
+      var _this = this;
+
+      this.player.addEventListener(event, function () {
+        for (var _len = arguments.length, params = new Array(_len), _key = 0; _key < _len; _key++) {
+          params[_key] = arguments[_key];
+        }
+
+        _this.$emit.apply(_this, [event].concat(params));
+      });
+    }
+  }),
+  mounted: function mounted() {
+    this.setEmbeddedPlayer();
+  }
+};
+
+function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
+/* server only */
+, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
+  if (typeof shadowMode !== 'boolean') {
+    createInjectorSSR = createInjector;
+    createInjector = shadowMode;
+    shadowMode = false;
+  } // Vue.extend constructor export interop.
+
+
+  var options = typeof script === 'function' ? script.options : script; // render functions
+
+  if (template && template.render) {
+    options.render = template.render;
+    options.staticRenderFns = template.staticRenderFns;
+    options._compiled = true; // functional template
+
+    if (isFunctionalTemplate) {
+      options.functional = true;
+    }
+  } // scopedId
+
+
+  if (scopeId) {
+    options._scopeId = scopeId;
+  }
+
+  var hook;
+
+  if (moduleIdentifier) {
+    // server build
+    hook = function hook(context) {
+      // 2.3 injection
+      context = context || // cached call
+      this.$vnode && this.$vnode.ssrContext || // stateful
+      this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext; // functional
+      // 2.2 with runInNewContext: true
+
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__;
+      } // inject component styles
+
+
+      if (style) {
+        style.call(this, createInjectorSSR(context));
+      } // register component module identifier for async chunk inference
+
+
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier);
+      }
+    }; // used by ssr in case component is cached and beforeCreate
+    // never gets called
+
+
+    options._ssrRegister = hook;
+  } else if (style) {
+    hook = shadowMode ? function () {
+      style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
+    } : function (context) {
+      style.call(this, createInjector(context));
+    };
+  }
+
+  if (hook) {
+    if (options.functional) {
+      // register for functional component in vue file
+      var originalRender = options.render;
+
+      options.render = function renderWithStyleInjection(h, context) {
+        hook.call(context);
+        return originalRender(h, context);
+      };
+    } else {
+      // inject component registration as beforeCreate hook
+      var existing = options.beforeCreate;
+      options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+    }
+  }
+
+  return script;
+}
+
+var normalizeComponent_1 = normalizeComponent;
+
+/* script */
+var __vue_script__$8 = script$8;
+/* template */
+
+var __vue_render__$8 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('div', {
+    staticClass: "api-video-player d-flex align-center justify-center",
+    attrs: {
+      "id": _vm.videoId
+    }
+  });
+};
+
+var __vue_staticRenderFns__$8 = [];
+/* style */
+
+var __vue_inject_styles__$8 = undefined;
+/* scoped */
+
+var __vue_scope_id__$8 = undefined;
+/* module identifier */
+
+var __vue_module_identifier__$8 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$8 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var ApiVideoPlayer = normalizeComponent_1({
+  render: __vue_render__$8,
+  staticRenderFns: __vue_staticRenderFns__$8
+}, __vue_inject_styles__$8, __vue_script__$8, __vue_scope_id__$8, __vue_is_functional_template__$8, __vue_module_identifier__$8, undefined, undefined);
+
+var CHUNK_SIZE = 64 * 1024 * 1024; // 64MB
+
+function upload(_ref) {
+  var url = _ref.url,
+      file = _ref.file,
+      videoId = _ref.videoId;
+  var size = file.size;
+  if (CHUNK_SIZE > file.size) return post({
+    url: url,
+    videoId: videoId,
+    chunk: file
+  });
+  var chunks = createChunks(file);
+  return Promise.all(chunks.map(function (it) {
+    return post(Object.assign({
+      url: url,
+      videoId: videoId,
+      size: size
+    }, it));
+  }));
+}
+
+function createChunks(file) {
+  var chunks = [];
+  var size = file.size;
+
+  for (var offset = 0; offset < size; offset += CHUNK_SIZE) {
+    var end = Math.min(offset + CHUNK_SIZE, size);
+    var chunk = file.slice(offset, end);
+    chunks.push({
+      chunk: chunk,
+      offset: offset,
+      end: end
+    });
+  }
+
+  return chunks;
+}
+
+function post(_ref2) {
+  var url = _ref2.url,
+      videoId = _ref2.videoId,
+      chunk = _ref2.chunk,
+      size = _ref2.size,
+      offset = _ref2.offset,
+      end = _ref2.end;
+  var headers = {
+    'Content-Type': 'multipart/form-data'
+  };
+
+  if (offset !== undefined && end !== undefined) {
+    headers['Content-Range'] = "bytes ".concat(offset, "-").concat(end - 1, "/").concat(size);
+  }
+
+  var formData = new FormData();
+  formData.append('file', chunk);
+  formData.append('videoId', videoId);
+  return axios.post(url, formData, {
+    headers: headers
+  });
+}
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var script$7 = {
+  name: 'element-placeholder',
+  props: {
+    name: {
+      type: String,
+      required: true
+    },
+    icon: {
+      type: String,
+      required: true
+    },
+    placeholder: {
+      type: String,
+      "default": 'Select to edit'
+    },
+    activePlaceholder: {
+      type: String,
+      "default": 'Use toolbar to edit'
+    },
+    activeIcon: {
+      type: String,
+      "default": null
+    },
+    activeColor: {
+      type: String,
+      "default": '#fff'
+    },
+    isDisabled: {
+      type: Boolean,
+      "default": false
+    },
+    isFocused: {
+      type: Boolean,
+      "default": false
+    },
+    dense: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  computed: {
+    iconSize: function iconSize() {
+      if (this.dense) return this.isFocused ? 24 : 20;
+      return this.isFocused ? 38 : 30;
+    }
+  }
+};
+
+/* script */
+var __vue_script__$7 = script$7;
+/* template */
+
+var __vue_render__$7 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('v-sheet', {
+    staticClass: "transparent grey--text text--darken-4",
+    "class": _vm.dense ? 'pt-3' : 'pa-12'
+  }, [_c('v-avatar', {
+    attrs: {
+      "size": _vm.dense ? 40 : 60,
+      "color": _vm.isDisabled ? 'grey darken-3' : 'blue-grey darken-4'
+    }
+  }, [_c('v-icon', {
+    attrs: {
+      "size": _vm.iconSize,
+      "color": _vm.isFocused ? _vm.activeColor : '#fff'
+    }
+  }, [_vm._v("\n      " + _vm._s(_vm.icon) + "\n    ")])], 1), _vm._v(" "), _c('div', {
+    staticClass: "grey--text",
+    "class": [_vm.isDisabled ? 'text--darken-3' : 'text--darken-4', _vm.dense ? 'my-2 subtitle-2' : 'my-4 headline']
+  }, [_vm._v("\n    " + _vm._s(_vm.name) + "\n  ")]), _vm._v(" "), !_vm.dense && !_vm.isDisabled ? _c('div', {
+    staticClass: "subtitle-1"
+  }, [!_vm.isFocused ? [_vm._v(_vm._s(_vm.placeholder))] : [_c('span', [_vm._v(_vm._s(_vm.activePlaceholder))]), _vm._v(" "), _vm.activeIcon ? _c('v-icon', {
+    attrs: {
+      "size": "20",
+      "color": "blue-grey darken-4"
+    }
+  }, [_vm._v("\n        " + _vm._s(_vm.activeIcon) + "\n      ")]) : _vm._e()]], 2) : _vm._e()], 1);
+};
+
+var __vue_staticRenderFns__$7 = [];
+/* style */
+
+var __vue_inject_styles__$7 = undefined;
+/* scoped */
+
+var __vue_scope_id__$7 = undefined;
+/* module identifier */
+
+var __vue_module_identifier__$7 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$7 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var ElementPlaceholder = normalizeComponent_1({
+  render: __vue_render__$7,
+  staticRenderFns: __vue_staticRenderFns__$7
+}, __vue_inject_styles__$7, __vue_script__$7, __vue_scope_id__$7, __vue_is_functional_template__$7, __vue_module_identifier__$7, undefined, undefined);
+
+//
+//
+//
+//
+//
+//
+var script$6 = {
+  name: 'tce-overlay'
+};
+
+/* script */
+var __vue_script__$6 = script$6;
+/* template */
+
+var __vue_render__$6 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('div', {
+    staticClass: "overlay d-flex align-center justify-center"
+  }, [_vm._t("default")], 2);
+};
+
+var __vue_staticRenderFns__$6 = [];
+/* style */
+
+var __vue_inject_styles__$6 = undefined;
+/* scoped */
+
+var __vue_scope_id__$6 = "data-v-28420ade";
+/* module identifier */
+
+var __vue_module_identifier__$6 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$6 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var TceOverlay = normalizeComponent_1({
+  render: __vue_render__$6,
+  staticRenderFns: __vue_staticRenderFns__$6
+}, __vue_inject_styles__$6, __vue_script__$6, __vue_scope_id__$6, __vue_is_functional_template__$6, __vue_module_identifier__$6, undefined, undefined);
+
+//
+var script$5 = {
+  name: 'error-message',
+  props: {
+    message: {
+      type: String,
+      required: true
+    }
+  },
+  components: {
+    TceOverlay: TceOverlay
+  }
+};
+
+/* script */
+var __vue_script__$5 = script$5;
+/* template */
+
+var __vue_render__$5 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('tce-overlay', [_c('div', {
+    staticClass: "message error--text"
+  }, [_c('v-icon', {
+    attrs: {
+      "color": "error"
+    }
+  }, [_vm._v("mdi-alert")]), _vm._v("\n    " + _vm._s(_vm.message) + "\n  ")], 1)]);
+};
+
+var __vue_staticRenderFns__$5 = [];
+/* style */
+
+var __vue_inject_styles__$5 = undefined;
+/* scoped */
+
+var __vue_scope_id__$5 = "data-v-576a2d2e";
+/* module identifier */
+
+var __vue_module_identifier__$5 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$5 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var ErrorMessage = normalizeComponent_1({
+  render: __vue_render__$5,
+  staticRenderFns: __vue_staticRenderFns__$5
+}, __vue_inject_styles__$5, __vue_script__$5, __vue_scope_id__$5, __vue_is_functional_template__$5, __vue_module_identifier__$5, undefined, undefined);
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var script$4 = {
+  name: 'tce-preview-overlay',
+  props: {
+    show: {
+      type: Boolean,
+      "default": false
+    }
+  }
+};
+
+/* script */
+var __vue_script__$4 = script$4;
+/* template */
+
+var __vue_render__$4 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('v-overlay', {
+    attrs: {
+      "value": _vm.show,
+      "opacity": "0.9",
+      "absolute": ""
+    }
+  }, [_c('button', {
+    staticClass: "message pa-2 grey--text text--lighten-2"
+  }, [_vm._t("default", [_vm._v("Click to preview")])], 2)]);
+};
+
+var __vue_staticRenderFns__$4 = [];
+/* style */
+
+var __vue_inject_styles__$4 = undefined;
+/* scoped */
+
+var __vue_scope_id__$4 = "data-v-4e41c6e0";
+/* module identifier */
+
+var __vue_module_identifier__$4 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$4 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var PreviewOverlay = normalizeComponent_1({
+  render: __vue_render__$4,
+  staticRenderFns: __vue_staticRenderFns__$4
+}, __vue_inject_styles__$4, __vue_script__$4, __vue_scope_id__$4, __vue_is_functional_template__$4, __vue_module_identifier__$4, undefined, undefined);
+
+//
+var script$3 = {
+  name: 'progress-message',
+  props: {
+    message: {
+      type: String,
+      required: true
+    }
+  },
+  components: {
+    TceOverlay: TceOverlay
+  }
+};
+
+/* script */
+var __vue_script__$3 = script$3;
+/* template */
+
+var __vue_render__$3 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('tce-overlay', [_c('div', {
+    staticClass: "message white--text"
+  }, [_c('v-progress-circular', {
+    staticClass: "mr-4",
+    attrs: {
+      "color": "white",
+      "indeterminate": ""
+    }
+  }), _vm._v("\n    " + _vm._s(_vm.message) + "\n  ")], 1)]);
+};
+
+var __vue_staticRenderFns__$3 = [];
+/* style */
+
+var __vue_inject_styles__$3 = undefined;
+/* scoped */
+
+var __vue_scope_id__$3 = "data-v-2cf5ce5b";
+/* module identifier */
+
+var __vue_module_identifier__$3 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$3 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var ProgressMessage = normalizeComponent_1({
+  render: __vue_render__$3,
+  staticRenderFns: __vue_staticRenderFns__$3
+}, __vue_inject_styles__$3, __vue_script__$3, __vue_scope_id__$3, __vue_is_functional_template__$3, __vue_module_identifier__$3, undefined, undefined);
+
+//
+var UPLOAD_FAILED_ERROR_MSG = 'Video upload failed. Please try again.';
+var UPLOADING_MSG = 'Video is uploading. Please do not leave the page.';
+var PROCESSING_MSG = 'Video is processing...';
+var script$2 = {
+  name: 'tce-api-video',
+  inject: ['$elementBus'],
+  props: {
+    element: {
+      type: Object,
+      required: true
+    },
+    isFocused: {
+      type: Boolean,
+      "default": false
+    },
+    isDisabled: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  data: function data() {
+    return {
+      file: null,
+      error: null,
+      showAlert: false
+    };
+  },
+  computed: {
+    isEmpty: function isEmpty() {
+      var _this$element$data = this.element.data,
+          error = _this$element$data.error,
+          fileName = _this$element$data.fileName;
+      return !error && !fileName;
+    },
+    didUploadFail: function didUploadFail() {
+      var status = this.element.data.status;
+      return status === shared.ELEMENT_STATE.UPLOADING && !this.file;
+    },
+    errorMessage: function errorMessage() {
+      var error = this.element.data.error;
+      return this.didUploadFail ? UPLOAD_FAILED_ERROR_MSG : error;
+    },
+    infoMessage: function infoMessage() {
+      var _this$element$data2 = this.element.data,
+          status = _this$element$data2.status,
+          playable = _this$element$data2.playable;
+      if (status === shared.ELEMENT_STATE.UPLOADING) return UPLOADING_MSG;
+      return !playable && PROCESSING_MSG;
+    },
+    isReadyToUpload: function isReadyToUpload() {
+      var _this$element$data3 = this.element.data,
+          videoId = _this$element$data3.videoId,
+          uploadUrl = _this$element$data3.uploadUrl;
+      return videoId && this.file && uploadUrl;
+    },
+    isFocusedOrDisabled: function isFocusedOrDisabled(_ref) {
+      var isDisabled = _ref.isDisabled,
+          isFocused = _ref.isFocused;
+      return isFocused || isDisabled;
+    }
+  },
+  methods: {
+    upload: function upload$1() {
+      var _this = this;
+
+      var _this$element$data4 = this.element.data,
+          videoId = _this$element$data4.videoId,
+          url = _this$element$data4.uploadUrl;
+      return upload({
+        videoId: videoId,
+        file: this.file,
+        url: url
+      }).then(function () {
+        _this.file = null;
+
+        _this.$emit('save', Object.assign({}, _this.element.data, {
+          status: shared.ELEMENT_STATE.UPLOADED
+        }));
+      })["catch"](function (err) {
+        _this.$emit('save', Object.assign({}, _this.element.data, {
+          error: get(err, 'response.data.title', shared.DEFAULT_ERROR_MSG),
+          status: null,
+          fileName: null
+        }));
+      });
+    }
+  },
+  watch: {
+    'element.data.videoId': function elementDataVideoId() {
+      if (this.isReadyToUpload) this.upload();
+    },
+    isFocusedOrDisabled: function isFocusedOrDisabled(value) {
+      if (!value && this.$refs.player) this.$refs.player.pause();
+    }
+  },
+  mounted: function mounted() {
+    var _this2 = this;
+
+    this.$elementBus.on('save', function (_ref2) {
+      var file = _ref2.file;
+      _this2.file = file;
+
+      _this2.$emit('save', Object.assign({}, _this2.element.data, {
+        fileName: file.name,
+        status: shared.ELEMENT_STATE.UPLOADING
+      }));
+    });
+    this.$elementBus.on('error', function (error) {
+      _this2.showAlert = true;
+      _this2.error = typeof error === 'string' ? error : get(error, 'response.data.error.message', shared.DEFAULT_ERROR_MSG);
+    });
+  },
+  components: {
+    ApiVideoPlayer: ApiVideoPlayer,
+    ElementPlaceholder: ElementPlaceholder,
+    ErrorMessage: ErrorMessage,
+    ProgressMessage: ProgressMessage,
+    PreviewOverlay: PreviewOverlay
+  }
+};
+
+/* script */
+var __vue_script__$2 = script$2;
+/* template */
+
+var __vue_render__$2 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('div', {
+    staticClass: "tce-api-video"
+  }, [_c('v-alert', {
+    staticClass: "text-left",
+    attrs: {
+      "type": "error",
+      "dismissible": ""
+    },
+    model: {
+      value: _vm.showAlert,
+      callback: function callback($$v) {
+        _vm.showAlert = $$v;
+      },
+      expression: "showAlert"
+    }
+  }, [_vm._v("\n    " + _vm._s(_vm.error) + "\n  ")]), _vm._v(" "), _vm.isEmpty ? _c('element-placeholder', {
+    attrs: {
+      "is-focused": _vm.isFocused,
+      "is-disabled": _vm.isDisabled,
+      "name": "Api Video component",
+      "icon": "mdi-video-image",
+      "active-placeholder": "Use toolbar to upload the video",
+      "active-icon": "mdi-arrow-up"
+    }
+  }) : _c('div', {
+    staticClass: "player-container"
+  }, [_vm.errorMessage ? _c('error-message', {
+    attrs: {
+      "message": _vm.errorMessage
+    }
+  }) : _vm.infoMessage ? _c('progress-message', {
+    attrs: {
+      "message": _vm.infoMessage
+    }
+  }) : [_c('preview-overlay', {
+    attrs: {
+      "show": !_vm.isFocusedOrDisabled
+    }
+  }, [_vm._v("\n        Double click to preview\n      ")]), _vm._v(" "), _c('api-video-player', _vm._b({
+    ref: "player"
+  }, 'api-video-player', _vm.element.data, false))]], 2)], 1);
+};
+
+var __vue_staticRenderFns__$2 = [];
+/* style */
+
+var __vue_inject_styles__$2 = undefined;
+/* scoped */
+
+var __vue_scope_id__$2 = "data-v-27862e4a";
+/* module identifier */
+
+var __vue_module_identifier__$2 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$2 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var Edit = normalizeComponent_1({
+  render: __vue_render__$2,
+  staticRenderFns: __vue_staticRenderFns__$2
+}, __vue_inject_styles__$2, __vue_script__$2, __vue_scope_id__$2, __vue_is_functional_template__$2, __vue_module_identifier__$2, undefined, undefined);
+
+var info = {
+  name: 'Api Video',
+  type: 'API_VIDEO',
+  version: '1.0'
+};
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var script$1 = {
+  name: 'video-upload-btn',
+  inheritAttrs: false,
+  props: {
+    label: {
+      type: String,
+      required: true
+    },
+    accept: {
+      type: String,
+      "default": 'video/mp4'
+    }
+  }
+};
+
+/* script */
+var __vue_script__$1 = script$1;
+/* template */
+
+var __vue_render__$1 = function __vue_render__() {
+  var _vm = this;
+
+  var _h = _vm.$createElement;
+
+  var _c = _vm._self._c || _h;
+
+  return _c('v-btn', _vm._b({
+    staticClass: "upload-btn text-uppercase",
+    attrs: {
+      "color": "primary darken-3",
+      "text": ""
+    },
+    on: {
+      "click": function click($event) {
+        return _vm.$refs.uploadInput.click();
+      }
+    }
+  }, 'v-btn', _vm.$attrs, false), [_vm._t("icon", [_c('v-icon', {
+    staticClass: "mr-2",
+    attrs: {
+      "color": "secondary darken-1"
+    }
+  }, [_vm._v("mdi-cloud-upload-outline")])]), _vm._v("\n  " + _vm._s(_vm.label) + "\n  "), _c('input', {
+    ref: "uploadInput",
+    staticClass: "d-none",
+    attrs: {
+      "accept": _vm.accept,
+      "type": "file"
+    },
+    on: {
+      "change": function change($event) {
+        return _vm.$emit('change', $event);
+      }
+    }
+  })], 2);
+};
+
+var __vue_staticRenderFns__$1 = [];
+/* style */
+
+var __vue_inject_styles__$1 = undefined;
+/* scoped */
+
+var __vue_scope_id__$1 = "data-v-54b9862e";
+/* module identifier */
+
+var __vue_module_identifier__$1 = undefined;
+/* functional template */
+
+var __vue_is_functional_template__$1 = false;
+/* style inject */
+
+/* style inject SSR */
+
+var UploadBtn = normalizeComponent_1({
+  render: __vue_render__$1,
+  staticRenderFns: __vue_staticRenderFns__$1
+}, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, undefined, undefined);
+
+var MP4_MIME_TYPE = 'video/mp4';
+var FORMAT_ERROR = 'MP4 format is required.';
+var script = {
+  name: 'tce-api-video-toolbar',
+  inject: ['$elementBus'],
+  props: {
+    element: {
+      type: Object,
+      required: true
+    }
+  },
+  computed: {
+    fileName: function fileName(_ref) {
+      var _element$data;
+
+      var element = _ref.element;
+      return (_element$data = element.data) === null || _element$data === void 0 ? void 0 : _element$data.fileName;
+    }
+  },
+  methods: {
+    upload: function upload(e) {
+      var _e$target$files = _slicedToArray$1(e.target.files, 1),
+          file = _e$target$files[0];
+
+      if (file.type !== MP4_MIME_TYPE) {
+        this.$elementBus.emit('error', FORMAT_ERROR);
+        return;
+      }
+
+      this.$elementBus.emit('save', {
+        file: file
+      });
+    }
+  },
+  components: {
+    UploadBtn: UploadBtn
+  }
+};
 
 /* script */
 var __vue_script__ = script;
@@ -99,7 +1099,32 @@ var __vue_render__ = function __vue_render__() {
 
   var _c = _vm._self._c || _h;
 
-  return _c('p', [_vm._v("Custom element template")]);
+  return _c('v-toolbar', {
+    staticClass: "elevation-0",
+    attrs: {
+      "height": "72",
+      "color": "transparent"
+    }
+  }, [_c('v-toolbar-title', {
+    staticClass: "pl-1 text-left"
+  }, [_vm._v("Api Video")]), _vm._v(" "), _c('v-toolbar-items', {
+    staticClass: "mx-auto"
+  }, [!_vm.fileName ? _c('upload-btn', {
+    staticClass: "upload-btn",
+    attrs: {
+      "label": "Upload Api video"
+    },
+    on: {
+      "change": _vm.upload
+    }
+  }) : _c('v-text-field', {
+    attrs: {
+      "value": _vm.fileName,
+      "readonly": "",
+      "hide-details": "",
+      "filled": ""
+    }
+  })], 1)], 1);
 };
 
 var __vue_staticRenderFns__ = [];
@@ -108,7 +1133,7 @@ var __vue_staticRenderFns__ = [];
 var __vue_inject_styles__ = undefined;
 /* scoped */
 
-var __vue_scope_id__ = undefined;
+var __vue_scope_id__ = "data-v-e7641378";
 /* module identifier */
 
 var __vue_module_identifier__ = undefined;
@@ -119,20 +1144,19 @@ var __vue_is_functional_template__ = false;
 
 /* style inject SSR */
 
-/* style inject shadow dom */
-
-var __vue_component__ = /*#__PURE__*/normalizeComponent({
+var Toolbar = normalizeComponent_1({
   render: __vue_render__,
   staticRenderFns: __vue_staticRenderFns__
-}, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, false, undefined, undefined, undefined);
+}, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, undefined, undefined);
 
-/**
- * A method used to create the initial state of the element by declaring the
- * defaults for the elements props. Does not need to be defined.
- */
-
-var initState = function initState() {
-  return {};
+var initState$1 = function initState() {
+  return {
+    fileName: null,
+    videoId: null,
+    playable: false,
+    status: null,
+    error: null
+  };
 };
 /**
  * The fields that need to be customized are:
@@ -143,21 +1167,22 @@ var initState = function initState() {
  * added as full width element
  */
 
-
-var plugin__default = {
-  name: 'Api video',
-  type: 'API_VIDEO',
-  version: '1.0',
-  initState: initState,
-  Edit: __vue_component__,
+var plugin__default = Object.assign({}, info, {
+  initState: initState$1,
+  components: {
+    Edit: Edit,
+    Toolbar: Toolbar
+  },
   ui: {
     icon: 'mdi-video',
     forceFullWidth: true
   }
-};
+});
 
 var plugin = /*#__PURE__*/Object.freeze({
   __proto__: null,
+  Edit: Edit,
+  Toolbar: Toolbar,
   'default': plugin__default
 });
 
@@ -318,16 +1343,16 @@ var isFunction = function isFunction(arg) {
   return typeof arg === 'function';
 };
 var _pluginOptions$initSt = plugin__default.initState,
-    initState$1 = _pluginOptions$initSt === void 0 ? function () {
+    initState = _pluginOptions$initSt === void 0 ? function () {
   return {};
 } : _pluginOptions$initSt,
     _pluginOptions$compon = plugin__default.components,
     components = _pluginOptions$compon === void 0 ? {} : _pluginOptions$compon;
 var options = Object.assign({
   version: version,
-  initState: initState$1,
+  initState: initState,
   components: components
-}, _missingExportShim);
+}, tailor);
 var install = function install(Vue) {
   if (hasProp(plugin, 'install')) {
     isFunction(_missingExportShim) && _missingExportShim(Vue);
@@ -344,6 +1369,5 @@ var install = function install(Vue) {
   });
 };
 
-exports.default = install;
-exports.install = install;
-exports.options = options;
+export default install;
+export { Edit, Toolbar, install, options };

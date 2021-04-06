@@ -1,0 +1,8 @@
+.api-video-player{background:#000}
+.overlay[data-v-28420ade]{position:absolute;z-index:3;width:100%;height:100%;background:rgba(16,16,16,.85)}
+.message[data-v-576a2d2e]{font-size:1.125rem}
+.message[data-v-4e41c6e0]{border-radius:2px;font-size:1.125rem}
+.message[data-v-2cf5ce5b]{font-size:1.125rem}
+.player-container[data-v-27862e4a]{position:relative;height:22.5rem}.player-container .api-video-player[data-v-27862e4a]{height:100%}
+.upload-btn.v-btn[data-v-54b9862e]{height:100%}
+.v-toolbar__title[data-v-e7641378]{min-width:23.875rem}.v-text-field[data-v-e7641378]{min-width:21.875rem;margin:.5rem .75rem 0 1.75rem}

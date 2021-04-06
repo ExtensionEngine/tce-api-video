@@ -1,25 +1,36 @@
 {
-  "name": "tce-api-video",
+  "name": "@extensionengine/tce-api-video",
   "version": "0.0.1",
   "description": "Tailor content element for Api video",
-  "main": "src/index.js",
-  "scripts": {
-    "prebuild": "del-cli dist",
-    "build": "bili",
-    "lint": "npm run lint:js && npm run lint:scss",
-    "lint:js": "eslint --ext .js,.vue .",
-    "lint:scss": "stylelint \"**/*.vue\" \"**/*.scss\""
+  "homepage": "https://github.com/ExtensionEngine/tce-api-video#readme",
+  "bugs": {
+    "url": "https://github.com/ExtensionEngine/tce-api-video/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ExtensionEngine/tce-api-video.git"
   },
-  "author": "ExtensionEngine <info@extensionengine.com>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/ExtensionEngine/tce-api-video/issues"
+  "author": "ExtensionEngine <info@extensionengine.com>",
+  "main": "dist/tce-api-video.umd.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "prebuild": "del-cli dist",
+    "build": "bili",
+    "dev": "bili --watch",
+    "lint": "npm run lint:js && npm run lint:scss",
+    "lint:js": "eslint --ext .js,.vue .",
+    "lint:scss": "stylelint \"**/*.vue\" \"**/*.scss\""
   },
-  "homepage": "https://github.com/ExtensionEngine/tce-api-video#readme",
+  "dependencies": {
+    "@api.video/nodejs-sdk": "^1.10.1",
+    "@api.video/player-sdk": "^1.2.5",
+    "axios": "^0.21.1",
+    "lodash": "^4.17.20",
+    "yn": "^4.0.0"
+  },
   "devDependencies": {
     "@babel/eslint-parser": "^7.12.1",
     "@babel/eslint-plugin": "^7.12.1",
@@ -40,8 +51,22 @@
     "eslint-plugin-require-sort": "^1.2.2",
     "eslint-plugin-standard": "^5.0.0",
     "eslint-plugin-vue": "^7.2.0",
-    "rollup-plugin-vue": "^5.1.9",
+    "node-sass": "^5.0.0",
+    "rollup-plugin-copy": "^3.3.0",
+    "rollup-plugin-vue": "^4.3.2",
     "stylelint": "^13.8.0",
     "vue-template-compiler": "^2.6.12"
+  },
+  "peerDependencies": {
+    "vee-validate": "^3.4.5",
+    "vuetify": "^2.2.20"
+  },
+  "tailor": {
+    "label": "Api video",
+    "type": "API_VIDEO",
+    "ui": {
+      "icon": "mdi-video",
+      "forceFullWidth": false
+    }
   }
 }
